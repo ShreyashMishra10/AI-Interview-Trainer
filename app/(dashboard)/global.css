@@ -1,0 +1,79 @@
+@import "tailwindcss";
+
+@theme {
+  /* The "Old Money" Luxe Palette */
+  --color-background: #09090b;
+  --color-foreground: #fafafa;
+  
+  /* Gold Accents */
+  --color-gold-muted: #b8912e;
+  --color-gold-bright: #f5d17a;
+  --color-gold-accent: #b8912e; /* Added alias for convenience */
+  
+  /* Card and Border Sophistication */
+  --color-card-bg: rgba(24, 24, 27, 0.4);
+  --color-card-border: rgba(39, 39, 39, 0.5);
+}
+
+/* Custom Base Styles */
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-geist-sans), sans-serif;
+  letter-spacing: -0.01em;
+}
+
+/* The Dashboard "Glass" Card */
+@utility dashboard-card {
+  background-color: var(--color-card-bg);
+  border: 1px solid var(--color-card-border);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  backdrop-filter: blur(12px);
+  transition: all 0.3s ease;
+}
+
+@utility gold-gradient-text {
+  background: linear-gradient(to right, #b8912e, #f5d17a, #b8912e);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@utility ready-badge {
+  background-color: rgba(184, 145, 46, 0.1);
+  border: 1px solid rgba(184, 145, 46, 0.3);
+  color: #f5d17a;
+  padding: 0.25rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* Heatmap Grid Logic */
+@utility heatmap-cell {
+  width: 14px; /* Scaled to fit dashboard proportions */
+  height: 14px;
+  border-radius: 2px;
+  background-color: rgba(39, 39, 42, 0.4);
+  border: 1px solid rgba(63, 63, 70, 0.3);
+  transition: all 0.2s ease;
+}
+
+@utility heatmap-active {
+  background-color: var(--color-gold-muted);
+  box-shadow: 0 0 8px rgba(184, 145, 46, 0.2);
+}
+
+/* Scrollbar refinement */
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #27272a;
+  border-radius: 10px;
+}
