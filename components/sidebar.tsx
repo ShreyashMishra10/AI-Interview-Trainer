@@ -24,7 +24,7 @@ export const Sidebar = () => {
         <SidebarLink href="/dashboard" icon={<LayoutDashboard size={18}/>} label="Dashboard" active={pathname === "/dashboard"} />
         <SidebarLink href="/dashboard/interviews" icon={<Mic2 size={18}/>} label="Interviews" active={pathname === "/dashboard/interviews"}/>
         <SidebarLink href="/dashboard/japanese" icon={<Languages size={18}/>} label="Japanese Sensei" active={pathname === "/dashboard/japanese"} />
-        <SidebarLink href="/dashboard/cv" icon={<FileText size={18}/>} label="CV Builder" active={pathname === "/dashboard/cv"} />
+        <SidebarLink href="/dashboard/cv-builder" icon={<FileText size={18}/>} label="CV Builder" active={pathname === "/dashboard/cv-builder"} />
       </nav>
       
       <div className="p-4 border-t border-zinc-800/50 space-y-4">
