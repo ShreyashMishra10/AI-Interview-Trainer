@@ -7,7 +7,7 @@ export default function InterviewsPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   return (
-    <div className="min-h-screen text-white">
+    <div className="min-h-screen bg-background text-foreground">
       <div>
         <div className="flex items-center justify-between mb-[28px]">
           <div>

@@ -20,9 +20,8 @@ interface FeedbackItemProps {
 
 export default function DashboardPage() {
   return (
-    <div className="max-w-[1400px] mx-auto space-y-10 animate-in fade-in duration-1000 p-6">
+    <div className="max-w-[1400px] mx-auto space-y-10 animate-in fade-in duration-1000 ">
       
-      {/* Hero Welcome Section */}
       <section className="py-4">
         <h1 className="text-5xl font-serif text-white tracking-tight">
           Welcome back, <span className="text-white/90">Shreyash.</span>

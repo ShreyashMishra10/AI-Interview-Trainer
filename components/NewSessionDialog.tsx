@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef } from "react";
+import { useRouter } from "next/navigation";
 
 interface NewSessionDialogProps {
   isOpen: boolean;
@@ -12,6 +13,7 @@ export default function NewSessionDialog({ isOpen, onClose }: NewSessionDialogPr
   const [role, setRole] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
 
   const isFormValid = name.trim() !== "" && role !== "" && selectedFile !== null;
 
@@ -143,6 +145,12 @@ export default function NewSessionDialog({ isOpen, onClose }: NewSessionDialogPr
         <div className="p-8 pt-0 flex gap-3 justify-end">
           <button className="px-6 py-3 rounded-xl border border-[#2d2d3d] text-[#7A7A9A] text-[14px] hover:text-white hover:bg-[#1c1c26]" onClick={onClose}>Cancel</button>
           <button 
+          onClick={() => {
+    if (!isFormValid) return;
+    const params = new URLSearchParams({ name, role, experience: "Mid" });
+    onClose();
+    router.push(`/dashboard/interviews/session?${params.toString()}`);
+  }}
             disabled={!isFormValid} 
             className={`px-7 py-3 rounded-xl text-[14px] font-semibold transition-all ${isFormValid ? 'bg-[#6C63FF] text-white hover:bg-[#7C74FF] hover:shadow-[0_0_20px_rgba(108,99,255,0.4)]' : 'bg-[#272731] text-[#4A4A6A] cursor-not-allowed'}`}
           >

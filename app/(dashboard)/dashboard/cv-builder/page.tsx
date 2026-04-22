@@ -13,7 +13,6 @@ import {
   Layout
 } from "lucide-react";
 
-// 1. Move Interfaces outside the component
 interface InputGroupProps {
   label: string;
   placeholder: string;
@@ -71,7 +70,6 @@ export default function AICVBuilder() {
 
       if (data.result) {
         try {
-          // Clean the string in case Gemini wraps it in markdown code blocks
           const jsonString = data.result.replace(/```json|```/g, "").trim();
           const parsed = JSON.parse(jsonString);
           setAiResult(parsed);
@@ -99,7 +97,7 @@ export default function AICVBuilder() {
   };
 
   return (
-    <div className="min-h-screen text-white p-7">
+    <div className="min-h-screen text-white">
       <div className="max-w-4xl mx-auto">
         
         {/* Header */}
@@ -115,7 +113,6 @@ export default function AICVBuilder() {
         {!isComplete ? (
           <div className="bg-[#12121a] border border-[#272731] rounded-[24px] p-8 shadow-2xl outline outline-1 outline-white/5 relative">
             
-            {/* Progress Tabs */}
             <div className="flex gap-3 mb-10">
               {[1, 2, 3, 4].map((i) => (
                 <div key={i} className={`h-1.5 flex-1 rounded-full transition-all duration-700 ${step >= i ? 'bg-[#6C63FF]' : 'bg-[#272731]'}`} />
@@ -191,7 +188,6 @@ export default function AICVBuilder() {
               )}
             </div>
 
-            {/* Navigation */}
             <div className="flex justify-between mt-10 pt-6 border-t border-[#272731]">
               <button 
                 onClick={() => setStep(Math.max(1, step - 1))}
@@ -224,7 +220,6 @@ export default function AICVBuilder() {
             </div>
           </div>
         ) : (
-          /* SUCCESS STATE */
           <div className="animate-in zoom-in duration-500 text-center py-20 bg-[#12121a] border border-[#272731] rounded-[32px] outline outline-1 outline-white/5">
             <div className="w-20 h-20 bg-[#6C63FF]/10 rounded-full flex items-center justify-center mx-auto mb-6">
               <CheckCircle2 className="text-[#6C63FF]" size={40} />
