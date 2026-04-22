@@ -23,7 +23,7 @@ export const Sidebar = () => {
       <nav className="flex-1 px-4 py-6 space-y-1.5">
         <SidebarLink href="/dashboard" icon={<LayoutDashboard size={18}/>} label="Dashboard" active={pathname === "/dashboard"} />
         <SidebarLink href="/dashboard/interviews" icon={<Mic2 size={18}/>} label="Interviews" active={pathname === "/dashboard/interviews"}/>
-        <SidebarLink href="/dashboard/japanese" icon={<Languages size={18}/>} label="Japanese Sensei" active={pathname === "/dashboard/japanese"} />
+        <SidebarLink href="/dashboard/japanese-sensei" icon={<Languages size={18}/>} label="Japanese Sensei" active={pathname === "/dashboard/japanese-sensei"} />
         <SidebarLink href="/dashboard/cv-builder" icon={<FileText size={18}/>} label="CV Builder" active={pathname === "/dashboard/cv-builder"} />
       </nav>
       
