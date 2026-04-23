@@ -14,11 +14,12 @@ export const Sidebar = () => {
     const pathname = usePathname();
   return (
     <aside className="w-64 border-r border-zinc-800/50 bg-black flex flex-col h-full shrink-0">
-      <div className="h-16 flex items-center px-6 border-b border-zinc-800/50">
+      <Link href="/dashboard"><div className="h-16 flex items-center px-6 border-b border-zinc-800/50">
         <span className="text-xl font-serif italic tracking-tighter text-white">
           AI-Interview
         </span>
       </div>
+      </Link>
       
       <nav className="flex-1 px-4 py-6 space-y-1.5">
         <SidebarLink href="/dashboard" icon={<LayoutDashboard size={18}/>} label="Dashboard" active={pathname === "/dashboard"} />
