@@ -32,7 +32,7 @@ export function Footer() {
       </section>
       <footer className="bg-black pt-18 pb-10 px-10 lg:px-40">
         <div className="max-w-[1400px] mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-6 gap-30 border-b border-white/5 pb-20">
+          <div className="grid grid-cols-1 md:grid-cols-6 gap-10 lg:gap-16 border-b border-white/5 pb-20">
             <div className="md:col-span-3 flex flex-col items-start">
               <Link
                 href="/"

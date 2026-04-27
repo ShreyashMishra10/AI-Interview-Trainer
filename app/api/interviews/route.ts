@@ -1,5 +1,7 @@
+import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-// import Anthropic from "@anthropic-ai/sdk";
+import { supabaseAdmin } from "@/lib/supabase/admin";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 interface Message {
   role: "user" | "assistant";
@@ -7,27 +9,42 @@ interface Message {
 }
 
 interface InterviewRequest {
-  messages: Message[];
-  role: string;
+  messages:      Message[];
+  role:          string;
   candidateName: string;
-  experience: string;
+  experience:    string;
   questionCount: number;
+  sessionId?:    string;
 }
 
+// GET /api/interviews — list all sessions for the current user
+export async function GET() {
+  const { userId } = await auth();
+  if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const { data, error } = await supabaseAdmin
+    .from("interview_sessions")
+    .select("*")
+    .eq("clerk_user_id", userId)
+    .order("created_at", { ascending: false });
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  return NextResponse.json(data);
+}
+
+// POST /api/interviews — get next AI response + save to Supabase
 export async function POST(req: Request) {
   try {
-    const apiKey = process.env.ANTHROPIC_API_KEY;
-    if (!apiKey) {
-      return NextResponse.json({ error: "API key missing" }, { status: 500 });
-    }
+    const { userId } = await auth();
+    if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) return NextResponse.json({ error: "API key missing" }, { status: 500 });
 
     const body: InterviewRequest = await req.json();
-    const { messages, role, candidateName, experience, questionCount } = body;
-
-    const client = new Anthropic({ apiKey });
+    const { messages, role, candidateName, experience, questionCount, sessionId } = body;
 
     const systemPrompt = `You are an expert technical interviewer conducting a real job interview for the role of "${role}".
-
 Candidate: ${candidateName}
 Experience Level: ${experience}
 
@@ -42,24 +59,58 @@ INTERVIEW RULES:
 - Be encouraging but honest.
 - No markdown, no bullet points. Plain conversational text only.`;
 
-    const response = await client.messages.create({
-      model: "claude-haiku-4-5-20251001",
-      max_tokens: 512,
-      system: systemPrompt,
-      messages: messages.map((m) => ({
-        role: m.role,
-        content: m.content,
-      })),
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({
+      model:             "gemini-1.5-flash",
+      systemInstruction: systemPrompt,
     });
 
-    const text =
-      response.content[0].type === "text" ? response.content[0].text : "";
+    // Gemini uses "model" instead of "assistant"
+    const history = messages.slice(0, -1).map((m) => ({
+      role:  m.role === "assistant" ? "model" : "user",
+      parts: [{ text: m.content }],
+    }));
+
+    const lastMessage = messages[messages.length - 1]?.content ?? "";
+
+    const chat   = model.startChat({ history });
+    const result = await chat.sendMessage(lastMessage);
+    const text   = result.response.text();
 
     const isComplete =
       questionCount >= 10 ||
       text.toLowerCase().includes("goodbye") ||
       text.toLowerCase().includes("good luck") ||
       text.toLowerCase().includes("that concludes");
+
+    // Save messages to Supabase if session exists
+    if (sessionId) {
+      const lastUserMessage = [...messages].reverse().find((m) => m.role === "user");
+
+      if (lastUserMessage) {
+        await supabaseAdmin.from("session_messages").insert([
+          {
+            session_id:      sessionId,
+            role:            "user",
+            content:         lastUserMessage.content,
+            question_number: questionCount,
+          },
+          {
+            session_id:      sessionId,
+            role:            "assistant",
+            content:         text,
+            question_number: questionCount,
+          },
+        ]);
+      }
+
+      if (isComplete) {
+        await supabaseAdmin
+          .from("interview_sessions")
+          .update({ status: "completed", completed_at: new Date().toISOString() })
+          .eq("id", sessionId);
+      }
+    }
 
     return NextResponse.json({ reply: text, isComplete });
   } catch (err: unknown) {

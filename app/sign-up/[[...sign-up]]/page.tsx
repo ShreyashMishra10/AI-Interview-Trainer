@@ -1,14 +1,17 @@
-"use client";
-
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 import { SignUp } from "@clerk/nextjs";
 
-export default function Page() {
+export default async function SignUpPage() {
+  const { userId } = await auth();
+  if (userId) redirect("/dashboard");
+
   return (
-    <main className="min-h-screen bg-background flex items-center justify-center p-6 relative">
+    <main className="w-full min-h-screen bg-background flex items-center justify-center p-6 relative">
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-muted/20 blur-[120px] rounded-full pointer-events-none" />
-      
+
       <div className="z-10">
-        <SignUp 
+        <SignUp
           appearance={{
             elements: {
               card: "border border-border shadow-2xl rounded-[2rem] bg-card text-card-foreground",
@@ -21,7 +24,7 @@ export default function Page() {
               formButtonPrimary: "bg-primary text-primary-foreground hover:opacity-90 transition-all font-bold rounded-xl",
               footerActionLink: "text-foreground hover:underline underline-offset-4",
               dividerText: "text-muted-foreground/50",
-            }
+            },
           }}
         />
       </div>

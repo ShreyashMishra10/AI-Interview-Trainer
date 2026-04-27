@@ -1,12 +1,18 @@
+import type { Metadata } from "next";
 import { Card } from "@/components/ui/card";
 import Image from "next/image";
 import { Footer } from "@/components/Footer";
 
+export const metadata: Metadata = {
+  title: "About — AI-Trainer",
+  description: "Learn about AI-Trainer, founded by Shreyash Mishra. Our mission is to democratize elite technical interview coaching using AI.",
+};
+
 export default function AboutPage() {
   return (
     <div>
-      <div className="flex min-h-[calc(100vh-81px)]">
-        <section className="grid grid-cols-1 w-full ml-40 mt-10 mb-10 mr-10 items">
+      <div className="flex flex-col lg:flex-row min-h-[calc(100vh-81px)] px-6 lg:px-16 gap-6 py-10">
+        <section className="flex-1 grid grid-cols-1">
           <Card className="pl-10 pb-10 pr-10 pt-10 border bg-white dark:bg-zinc-900/50">
             <p className="text-zinc-400 dark:text-amber-600 text-[16px] tracking-[0.2em] font-semibold">
               How It Started
@@ -26,7 +32,7 @@ export default function AboutPage() {
             </p>
           </Card>
         </section>
-        <section className="grid grid-cols-1 w-full mb-10 mr-40 mt-10 space-y-6">
+        <section className="flex-1 grid grid-cols-1 space-y-6">
           <Card className="relative overflow-hidden border border-zinc-200/50 aspect-video">
             <Image src="/ai-interview.webp" alt="ai-interview" fill />
           </Card>

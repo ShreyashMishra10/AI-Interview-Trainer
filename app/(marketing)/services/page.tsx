@@ -1,4 +1,10 @@
+import type { Metadata } from "next";
 import { Footer }        from "@/components/Footer";
+
+export const metadata: Metadata = {
+  title: "Services — AI-Trainer",
+  description: "Explore AI mock interviews, CV builder, voice interview mode, JP-Sensei Japanese learning, and performance analytics. Everything you need to land your dream tech job.",
+};
 import { ServicesHero, ServicesStats } from "@/components/services/ServicesHero";
 import { ServiceCard }   from "@/components/services/ServiceCard";
 import { ServicesCTA }   from "@/components/services/ServicesCTA";

@@ -1,7 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { Sidebar } from "@/components/sidebar";
-import { Search, Bell } from "lucide-react";
+import { Search, Bell, Menu } from "lucide-react";
 import { usePathname } from "next/navigation";
 import "./global.css";
 
@@ -11,23 +12,43 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  
+  const [sidebarOpen, setSidebarOpen]           = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
   const isSessionPage = pathname.includes("/session");
 
   return (
     <div className="flex h-screen bg-background overflow-hidden selection:bg-gold-accent/30">
-      {!isSessionPage && <Sidebar />}
-      
+      {!isSessionPage && (
+        <Sidebar
+          collapsed={sidebarCollapsed}
+          onToggleCollapse={() => setSidebarCollapsed((prev) => !prev)}
+          mobileOpen={sidebarOpen}
+          onMobileClose={() => setSidebarOpen(false)}
+        />
+      )}
+
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {!isSessionPage && (
-          <header className="h-16 border-b border-zinc-800/50 flex items-center justify-between px-8 bg-black/20 backdrop-blur-xl sticky top-0 z-50">
-            <div className="flex items-center gap-3" />
+          <header className="h-16 border-b border-zinc-800/50 flex items-center justify-between px-6 lg:px-8 bg-black/20 backdrop-blur-xl sticky top-0 z-40">
 
+            {/* Left: hamburger (mobile only) */}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setSidebarOpen(true)}
+                aria-label="Open menu"
+                className="md:hidden text-zinc-500 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-zinc-800"
+              >
+                <Menu size={20} />
+              </button>
+            </div>
+
+            {/* Right: status + actions */}
             <div className="flex items-center gap-6">
               <div className="hidden sm:flex items-center gap-2.5 px-3 py-1.5 bg-zinc-900/40 border border-zinc-800/50 rounded-full">
                 <div className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
                 </div>
                 <span className="text-[10px] text-zinc-400 font-semibold uppercase tracking-wider">
                   AI Engine: Online
@@ -39,14 +60,14 @@ export default function DashboardLayout({
                 </button>
                 <button className="text-zinc-500 hover:text-white transition-colors p-1.5 relative">
                   <Bell size={18} strokeWidth={1.5} />
-                  <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-gold-accent rounded-full border border-black"></span>
+                  <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-gold-accent rounded-full border border-black" />
                 </button>
               </div>
             </div>
           </header>
         )}
-        
-        <main className={`flex-1 overflow-y-auto scroll-smooth bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-zinc-900/20 via-background to-background ${isSessionPage ? 'p-0' : 'p-6 lg:p-10'}`}>
+
+        <main className={`flex-1 overflow-y-auto scroll-smooth bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-zinc-900/20 via-background to-background ${isSessionPage ? "p-0" : "p-6 lg:p-10"}`}>
           <div className={isSessionPage ? "w-full h-full" : "max-w-7xl mx-auto"}>
             {children}
           </div>

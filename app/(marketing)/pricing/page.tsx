@@ -265,7 +265,8 @@ export default function PricingPage() {
             <p className="text-muted-foreground text-sm font-medium">Every detail, side by side.</p>
           </div>
 
-          <div className="bg-white dark:bg-card border border-zinc-200 dark:border-border rounded-2xl overflow-hidden shadow-sm dark:shadow-none">
+          <div className="overflow-x-auto rounded-2xl">
+          <div className="bg-white dark:bg-card border border-zinc-200 dark:border-border rounded-2xl overflow-hidden shadow-sm dark:shadow-none min-w-[520px]">
             {/* Table header */}
             <div className="grid grid-cols-4 border-b border-zinc-200 dark:border-border">
               <div className="p-4 text-xs font-bold uppercase tracking-widest text-muted-foreground">Feature</div>
@@ -299,6 +300,7 @@ export default function PricingPage() {
                 <div className="p-4 flex items-center justify-center"><FeatureCell value={row.enterprise} /></div>
               </div>
             ))}
+          </div>
           </div>
         </section>
 
