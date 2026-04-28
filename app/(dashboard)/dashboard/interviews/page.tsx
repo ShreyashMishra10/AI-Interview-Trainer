@@ -1,74 +1,188 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 import NewSessionDialog from "@/components/NewSessionDialog";
+import { Mic2, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 
-export default function InterviewsPage() {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+interface Session {
+  id:               string;
+  job_role:         string;
+  experience_level: string;
+  mode:             string;
+  score:            number | null;
+  status:           string;
+  created_at:       string;
+  completed_at:     string | null;
+}
+
+function timeAgo(dateStr: string) {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins  = Math.floor(diff / 60000);
+  const hours = Math.floor(diff / 3600000);
+  const days  = Math.floor(diff / 86400000);
+  if (mins < 60)  return `${mins}m ago`;
+  if (hours < 24) return `${hours}h ago`;
+  if (days === 1) return "Yesterday";
+  return `${days} days ago`;
+}
+
+function scoreColor(score: number | null) {
+  if (score === null) return "text-zinc-500";
+  if (score >= 75) return "text-emerald-400";
+  if (score >= 50) return "text-amber-400";
+  return "text-red-400";
+}
+
+function SessionCard({ session, onClick }: { session: Session; onClick: () => void }) {
+  const isCompleted = session.status === "completed";
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <div>
-        <div className="flex items-center justify-between mb-[28px]">
-          <div>
-            <h1 className="font-[var(--syne)] text-[26px] font-bold tracking-[-0.5px]">Interview sessions</h1>
-            <p className="text-[#7A7A9A] text-[14px] mt-[4px]">All your practice sessions — review, retake, or start fresh.</p>
-          </div>
-          <button 
-            className="flex items-center gap-[8px] bg-[#6C63FF] text-white border-none rounded-[10px] px-[18px] py-[10px] text-[14px] font-medium font-[var(--dm)] cursor-pointer transition-all duration-150 hover:bg-[#7C74FF] hover:-translate-y-[1px] shrink-0"
-            onClick={() => setIsDialogOpen(true)}
-          >
-            <svg className="w-[16px] h-[16px]" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M8 2v12M2 8h12" stroke="white" strokeWidth="2" strokeLinecap="round" />
-            </svg>
-            New session
-          </button>
-        </div>
-
-        {/* Filter Row */}
-        <div className="flex gap-[8px] mb-[20px]">
-          <button className="px-[14px] py-[6px] rounded-[20px] text-[13px] border border-[#6C63FF] text-[#6C63FF] bg-[rgba(108,99,255,0.08)] font-[var(--dm)]">All</button>
-          {["Frontend", "Backend", "ML / AI", "DevOps", "DSA"].map((filter) => (
-            <button key={filter} className="px-[14px] py-[6px] rounded-[20px] text-[13px] border border-[#272731] bg-transparent text-[#7A7A9A] cursor-pointer font-[var(--dm)] transition-all hover:border-[#6C63FF] hover:text-[#6C63FF]">
-              {filter}
-            </button>
-          ))}
-        </div>
-
-        {/* History Grid */}
-        <div className="grid gap-[12px]">
-          <InterviewCard title="React Developer" emoji="⚛️" bgColor="rgba(108,99,255,0.15)" score={82} scoreColor="text-[#34D399]" time="Yesterday" questions="12" duration="38 min" />
-          <InterviewCard title="Python Backend Developer" emoji="🐍" bgColor="rgba(52,211,153,0.1)" score={71} scoreColor="text-[#FBBF24]" time="2 days ago" questions="10" duration="29 min" />
-          <InterviewCard title="Machine Learning Engineer" emoji="🤖" bgColor="rgba(251,191,36,0.1)" score={88} scoreColor="text-[#34D399]" time="4 days ago" questions="15" duration="52 min" />
-          <InterviewCard title="DevOps Engineer" emoji="☁️" bgColor="rgba(248,113,113,0.1)" score={58} scoreColor="text-[#F87171]" time="1 week ago" questions="9" duration="25 min" status="Incomplete" />
-        </div>
+    <div
+      onClick={onClick}
+      className="bg-[#171721] border border-[#272731] rounded-[14px] p-[18px_20px] flex items-center gap-4 cursor-pointer transition-all hover:border-[#373741] hover:bg-[#1D1D28] hover:-translate-y-[1px]"
+    >
+      {/* Icon */}
+      <div className="w-11 h-11 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">
+        <Mic2 size={18} className="text-amber-500" />
       </div>
 
-      <NewSessionDialog 
-        isOpen={isDialogOpen} 
-        onClose={() => setIsDialogOpen(false)}
-      />
-      
+      {/* Info */}
+      <div className="flex-1 min-w-0">
+        <div className="text-[15px] font-medium mb-1 text-white truncate">{session.job_role}</div>
+        <div className="text-[12px] text-[#7A7A9A] flex items-center gap-3 flex-wrap">
+          <span>{timeAgo(session.created_at)}</span>
+          <span className="w-[3px] h-[3px] rounded-full bg-[#4A4A6A]" />
+          <span className="capitalize">{session.experience_level} level</span>
+          <span className="w-[3px] h-[3px] rounded-full bg-[#4A4A6A]" />
+          <span className="capitalize">{session.mode} mode</span>
+        </div>
+        <span className={`inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full mt-1.5 ${
+          isCompleted
+            ? "bg-emerald-500/10 text-emerald-400"
+            : "bg-amber-500/10 text-amber-400"
+        }`}>
+          {isCompleted
+            ? <CheckCircle2 size={10} />
+            : <AlertCircle size={10} />}
+          {isCompleted ? "Completed" : "In Progress"}
+        </span>
+      </div>
+
+      {/* Score */}
+      <div className="text-right shrink-0">
+        {isCompleted ? (
+          <>
+            <div className={`text-[22px] font-bold ${scoreColor(session.score)}`}>
+              {session.score ?? "—"}
+            </div>
+            <div className="text-[11px] text-[#7A7A9A]">score</div>
+          </>
+        ) : (
+          <div className="text-[11px] text-[#7A7A9A]">ongoing</div>
+        )}
+      </div>
     </div>
   );
 }
 
-function InterviewCard({ title, emoji, bgColor, score, scoreColor, time, questions, duration, status = "Completed" }: any) {
-  const isIncomplete = status === "Incomplete";
+export default function InterviewsPage() {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [sessions, setSessions]         = useState<Session[]>([]);
+  const [loading, setLoading]           = useState(true);
+  const [filter, setFilter]             = useState("All");
+
+  const FILTERS = ["All", "Frontend", "Backend", "ML / AI", "DevOps", "DSA"];
+
+  useEffect(() => {
+    fetch("/api/interviews")
+      .then((r) => r.json())
+      .then((data) => setSessions(Array.isArray(data) ? data : []))
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
+
+  const filtered = filter === "All"
+    ? sessions
+    : sessions.filter((s) => s.job_role.toLowerCase().includes(filter.toLowerCase()));
+
   return (
-    <div className="bg-[#171721] border border-[#272731] rounded-[14px] p-[18px_20px] flex items-center gap-[16px] cursor-pointer transition-all hover:border-[#373741] hover:bg-[#1D1D28] hover:-translate-y-[1px]">
-      <div className="w-[44px] h-[44px] rounded-[12px] flex items-center justify-center text-[20px] shrink-0" style={{ background: bgColor }}>{emoji}</div>
-      <div className="flex-1 min-w-0">
-        <div className="text-[15px] font-medium mb-[3px] text-white">{title}</div>
-        <div className="text-[12px] text-[#7A7A9A] flex items-center gap-[12px]">
-          <span>{time}</span><span className="w-[3px] h-[3px] rounded-full bg-[#4A4A6A]"></span><span>{questions} questions</span><span className="w-[3px] h-[3px] rounded-full bg-[#4A4A6A]"></span><span>{duration}</span>
+    <div className="min-h-screen text-foreground">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-7">
+        <div>
+          <h1 className="text-[26px] font-bold tracking-tight text-white">Interview sessions</h1>
+          <p className="text-[#7A7A9A] text-[14px] mt-1">All your practice sessions — review, retake, or start fresh.</p>
         </div>
-        <span className={`inline-flex items-center text-[11px] px-[8px] py-[3px] rounded-[20px] mt-[4px] ${isIncomplete ? 'bg-[rgba(251,191,36,0.12)] text-[#FBBF24]' : 'bg-[rgba(52,211,153,0.1)] text-[#34D399]'}`}>{status}</span>
+        <button
+          onClick={() => setIsDialogOpen(true)}
+          className="flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-black border-none rounded-xl px-5 py-2.5 text-[14px] font-semibold cursor-pointer transition-all shrink-0 shadow-lg shadow-amber-500/20"
+        >
+          <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
+          New session
+        </button>
       </div>
-      <div className="text-right">
-        <div className={`font-[var(--syne)] text-[22px] font-bold ${scoreColor}`}>{score}</div>
-        <div className="text-[11px] text-[#7A7A9A]">score</div>
+
+      {/* Filters */}
+      <div className="flex gap-2 mb-5 flex-wrap">
+        {FILTERS.map((f) => (
+          <button
+            key={f}
+            onClick={() => setFilter(f)}
+            className={`px-4 py-1.5 rounded-full text-[13px] border transition-all ${
+              filter === f
+                ? "border-amber-500/50 text-amber-400 bg-amber-500/10"
+                : "border-[#272731] bg-transparent text-[#7A7A9A] hover:border-amber-500/30 hover:text-amber-400/70"
+            }`}
+          >
+            {f}
+          </button>
+        ))}
       </div>
+
+      {/* Sessions list */}
+      {loading ? (
+        <div className="flex items-center justify-center py-24">
+          <Loader2 size={22} className="animate-spin text-amber-500" />
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-24 gap-4 text-center">
+          <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+            <Mic2 size={24} className="text-amber-500" />
+          </div>
+          <p className="text-white font-semibold">No sessions yet</p>
+          <p className="text-[#7A7A9A] text-sm max-w-xs">
+            {filter !== "All" ? `No ${filter} sessions found.` : "Start your first mock interview to begin tracking progress."}
+          </p>
+          {filter === "All" && (
+            <button
+              onClick={() => setIsDialogOpen(true)}
+              className="mt-2 px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black text-sm font-semibold transition-all"
+            >
+              Start first interview →
+            </button>
+          )}
+        </div>
+      ) : (
+        <div className="grid gap-3">
+          {filtered.map((s) => (
+            <SessionCard
+              key={s.id}
+              session={s}
+              onClick={() => {
+                if (s.status === "in_progress") {
+                  const params = new URLSearchParams({ role: s.job_role, experience: s.experience_level, sessionId: s.id, name: "You" });
+                  window.location.href = `/dashboard/interviews/session?${params.toString()}`;
+                }
+              }}
+            />
+          ))}
+        </div>
+      )}
+
+      <NewSessionDialog
+        isOpen={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+      />
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { auth } from "@clerk/nextjs/server";
 import { ChatInterface } from "@/components/chat-interface";
 import { Button } from "@/components/ui/button";
 import { Footer } from "@/components/Footer";
@@ -146,7 +147,10 @@ const MARQUEE_ITEMS = [
 ];
 
 /* ── Page (Server Component) ───────────────────────────────── */
-export default function Home() {
+export default async function Home() {
+  const { userId } = await auth();
+  const isLoggedIn = !!userId;
+
   return (
     <main>
       {/* ── HERO ──────────────────────────────────────────── */}
@@ -167,8 +171,8 @@ export default function Home() {
           }}
         />
 
-        {/* Left: text */}
-        <div className="flex-1 space-y-6 relative z-10 self-center">
+        {/* Hero text — centered when logged in, left-aligned when not */}
+        <div className={`space-y-6 relative z-10 self-center ${isLoggedIn ? "w-full text-center flex flex-col items-center" : "flex-1"}`}>
           <div
             className="animate-reveal inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 rounded-full px-4 py-1.5"
             style={{ animationDelay: "0ms" }}
@@ -180,7 +184,7 @@ export default function Home() {
           </div>
 
           <h1
-            className="animate-reveal text-5xl lg:text-7xl font-bold tracking-tight leading-tight"
+            className={`animate-reveal font-bold tracking-tight leading-tight ${isLoggedIn ? "text-5xl lg:text-8xl" : "text-5xl lg:text-7xl"}`}
             style={{ animationDelay: "150ms" }}
           >
             Nail Your Next Big <br /> Interview With an <br />
@@ -188,7 +192,7 @@ export default function Home() {
           </h1>
 
           <p
-            className="animate-reveal text-lg text-muted-foreground max-w-md"
+            className="animate-reveal text-lg text-muted-foreground max-w-xl"
             style={{ animationDelay: "300ms" }}
           >
             Practice real-time coding and behavioral questions with an AI that
@@ -196,21 +200,31 @@ export default function Home() {
           </p>
 
           <div
-            className="animate-reveal flex flex-col sm:flex-row sm:items-center gap-4"
+            className="animate-reveal flex flex-col sm:flex-row items-center gap-4"
             style={{ animationDelay: "450ms" }}
           >
-            <Link href="/sign-up">
-              <Button className="h-12 px-8 text-base font-bold bg-amber-500 hover:bg-amber-400 text-black shadow-[0_0_24px_rgba(251,191,36,0.35)] transition-all">
-                Start Training for Free
-              </Button>
-            </Link>
-            <Link
-              href="/services"
-              className="text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1.5 group"
-            >
-              See all features
-              <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-            </Link>
+            {isLoggedIn ? (
+              <Link href="/dashboard">
+                <Button className="h-12 px-10 text-base font-bold bg-amber-500 hover:bg-amber-400 text-black shadow-[0_0_24px_rgba(251,191,36,0.35)] transition-all">
+                  Go to Dashboard →
+                </Button>
+              </Link>
+            ) : (
+              <>
+                <Link href="/sign-up">
+                  <Button className="h-12 px-8 text-base font-bold bg-amber-500 hover:bg-amber-400 text-black shadow-[0_0_24px_rgba(251,191,36,0.35)] transition-all">
+                    Start Training for Free
+                  </Button>
+                </Link>
+                <Link
+                  href="/services"
+                  className="text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1.5 group"
+                >
+                  See all features
+                  <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Trust line */}
@@ -225,13 +239,15 @@ export default function Home() {
           </p>
         </div>
 
-        {/* Right: live demo */}
-        <div
-          className="animate-reveal flex-1 flex justify-center lg:justify-end w-full relative z-10 self-center"
-          style={{ animationDelay: "200ms" }}
-        >
-          <ChatInterface />
-        </div>
+        {/* Right: live demo — only shown to logged-out users */}
+        {!isLoggedIn && (
+          <div
+            className="animate-reveal flex-1 flex justify-center lg:justify-end w-full relative z-10 self-center"
+            style={{ animationDelay: "200ms" }}
+          >
+            <ChatInterface />
+          </div>
+        )}
       </section>
 
       {/* ── STATS ─────────────────────────────────────────── */}

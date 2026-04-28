@@ -194,9 +194,11 @@ export default function InterviewSessionPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const candidateName = searchParams.get("name") || "Candidate";
-  const role = searchParams.get("role") || "Software Engineer";
-  const experience = searchParams.get("experience") || "Mid";
+  const candidateName = searchParams.get("name")       || "Candidate";
+  const role          = searchParams.get("role")       || "Software Engineer";
+  const experience    = searchParams.get("experience") || "Mid";
+  const sessionId     = searchParams.get("sessionId")  || undefined;
+  const cvContext     = sessionId ? (typeof window !== "undefined" ? sessionStorage.getItem(`cv_${sessionId}`) ?? "" : "") : "";
 
   const [mode, setMode] = useState<Mode>("chat");
   const [messages, setMessages] = useState<Message[]>([]);
@@ -248,6 +250,8 @@ export default function InterviewSessionPage() {
             candidateName,
             experience,
             questionCount,
+            sessionId,
+            cvContext: cvContext || undefined,
           }),
         });
         const data = await res.json();
@@ -300,6 +304,8 @@ export default function InterviewSessionPage() {
           candidateName,
           experience,
           questionCount: 0,
+          sessionId,
+          cvContext: cvContext || undefined,
         }),
       });
       const data = await res.json();
@@ -498,11 +504,24 @@ export default function InterviewSessionPage() {
             {autoSpeak ? <Volume2 size={14} /> : <VolumeX size={14} />}
           </button>
           <div className="flex items-center gap-1.5 bg-[#1c1c26] border border-[#272731] rounded-lg px-3 py-1.5">
-  {mode === "chat"
-    ? <><MessageSquare size={12} className="text-[#6C63FF]" /><span className="text-xs text-[#7A7A9A]">Chat</span></>
-    : <><Radio size={12} className="text-[#6C63FF]" /><span className="text-xs text-[#7A7A9A]">Voice</span></>
-  }
-</div>
+            {mode === "chat"
+              ? <><MessageSquare size={12} className="text-[#6C63FF]" /><span className="text-xs text-[#7A7A9A]">Chat</span></>
+              : <><Radio size={12} className="text-[#6C63FF]" /><span className="text-xs text-[#7A7A9A]">Voice</span></>
+            }
+          </div>
+
+          {/* End Interview button */}
+          <button
+            onClick={async () => {
+              if (sessionId) {
+                await fetch(`/api/interviews/sessions/${sessionId}`, { method: "PATCH" });
+              }
+              setIsComplete(true);
+            }}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition text-xs font-semibold"
+          >
+            End Interview
+          </button>
         </div>
       </div>
 

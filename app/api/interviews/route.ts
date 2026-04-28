@@ -15,6 +15,7 @@ interface InterviewRequest {
   experience:    string;
   questionCount: number;
   sessionId?:    string;
+  cvContext?:    string;
 }
 
 // GET /api/interviews — list all sessions for the current user
@@ -42,11 +43,12 @@ export async function POST(req: Request) {
     if (!apiKey) return NextResponse.json({ error: "API key missing" }, { status: 500 });
 
     const body: InterviewRequest = await req.json();
-    const { messages, role, candidateName, experience, questionCount, sessionId } = body;
+    const { messages, role, candidateName, experience, questionCount, sessionId, cvContext } = body;
 
     const systemPrompt = `You are an expert technical interviewer conducting a real job interview for the role of "${role}".
 Candidate: ${candidateName}
 Experience Level: ${experience}
+${cvContext ? `\nCandidate's CV / Resume:\n${cvContext}\n\nUse the CV to personalise your questions — ask about specific projects, technologies, and experience mentioned in their resume.` : ""}
 
 INTERVIEW RULES:
 - Ask ONE question at a time. Never ask multiple questions in one message.
