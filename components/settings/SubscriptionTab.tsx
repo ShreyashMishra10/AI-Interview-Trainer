@@ -153,12 +153,13 @@ export function SubscriptionTab() {
         <SettingSection title="Upgrade Plan">
           <div className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
             {plans.map((p) => (
-              <div
+              <Link
                 key={p.name}
-                className={`p-5 rounded-xl border transition-all ${
+                href="/pricing"
+                className={`flex flex-col p-5 rounded-xl border transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl group ${
                   p.highlight
-                    ? "border-amber-400/30 bg-amber-400/5"
-                    : "border-zinc-800 bg-[#0d0d16]"
+                    ? "border-amber-400/30 bg-amber-400/5 hover:border-amber-400/60 hover:shadow-amber-500/10"
+                    : "border-zinc-800 bg-[#0d0d16] hover:border-zinc-600 hover:shadow-black/30"
                 }`}
               >
                 {p.highlight && (
@@ -173,24 +174,23 @@ export function SubscriptionTab() {
                 <p className="text-sm font-semibold text-zinc-300 mb-4 flex items-center gap-1.5">
                   {p.icon} {p.name}
                 </p>
-                <ul className="space-y-2 mb-5">
+                <ul className="space-y-2 mb-5 flex-1">
                   {p.features.map((f) => (
                     <li key={f} className="flex items-center gap-2 text-xs text-zinc-500">
                       <Check size={12} className="text-amber-400 shrink-0" /> {f}
                     </li>
                   ))}
                 </ul>
-                <Link
-                  href="/pricing"
-                  className={`block w-full py-2.5 rounded-xl text-xs font-bold text-center transition-all ${
+                <div
+                  className={`w-full py-2.5 rounded-xl text-xs font-bold text-center transition-all mt-auto ${
                     p.highlight
-                      ? "bg-amber-500 hover:bg-amber-400 text-black"
-                      : "border border-zinc-700 text-zinc-400 hover:border-zinc-600 hover:text-white"
+                      ? "bg-amber-500 group-hover:bg-amber-400 text-black"
+                      : "border border-zinc-700 text-zinc-400 group-hover:border-zinc-500 group-hover:text-white"
                   }`}
                 >
                   Upgrade to {p.name}
-                </Link>
-              </div>
+                </div>
+              </Link>
             ))}
           </div>
         </SettingSection>

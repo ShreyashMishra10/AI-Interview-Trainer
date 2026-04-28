@@ -57,6 +57,7 @@ INTERVIEW RULES:
 - After each answer, give brief constructive feedback (1 sentence), then ask the next question.
 - You are on question ${questionCount} of 10.
 - After question 10, wrap up: give overall assessment with 2-3 strengths and 1-2 areas to improve, then say goodbye.
+- At the very end of your final message, on a new line, write exactly: SCORE: XX/100 (where XX is an integer 0–100 reflecting the candidate's overall technical performance).
 - Keep responses concise and conversational.
 - Be encouraging but honest.
 - No markdown, no bullet points. Plain conversational text only.`;
@@ -77,7 +78,14 @@ INTERVIEW RULES:
 
     const chat   = model.startChat({ history });
     const result = await chat.sendMessage(lastMessage);
-    const text   = result.response.text();
+    const rawText = result.response.text();
+
+    // Extract score from final message (e.g. "SCORE: 78/100")
+    const scoreMatch = rawText.match(/SCORE:\s*(\d{1,3})\/100/i);
+    const score      = scoreMatch ? Math.min(100, Math.max(0, parseInt(scoreMatch[1]))) : null;
+
+    // Strip the score line from the user-facing reply
+    const text = rawText.replace(/\n?SCORE:\s*\d{1,3}\/100/i, "").trim();
 
     const isComplete =
       questionCount >= 10 ||
@@ -109,12 +117,16 @@ INTERVIEW RULES:
       if (isComplete) {
         await supabaseAdmin
           .from("interview_sessions")
-          .update({ status: "completed", completed_at: new Date().toISOString() })
+          .update({
+            status:       "completed",
+            completed_at: new Date().toISOString(),
+            ...(score !== null && { score }),
+          })
           .eq("id", sessionId);
       }
     }
 
-    return NextResponse.json({ reply: text, isComplete });
+    return NextResponse.json({ reply: text, isComplete, score });
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : "Internal Server Error";
     console.error("Interview API Error:", msg);

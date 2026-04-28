@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 import { CheckCircle2, Circle, ChevronDown, ChevronRight, BookOpen, Zap, Target, Clock, Star, ArrowUpRight } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -139,17 +139,18 @@ function PriorityBadge({ priority }: { priority: Topic["priority"] }) {
 
 // ─── Phase Card ───────────────────────────────────────────────────────────────
 
-function PhaseCard({ phase }: { phase: Phase }) {
+function PhaseCard({ phase, completed: completedIds, onToggle }: {
+  phase: Phase;
+  completed: Set<string>;
+  onToggle: (id: string) => void;
+}) {
   const [open, setOpen] = useState(false);
-  const [topics, setTopics] = useState(phase.topics);
 
-  const completed = topics.filter((t) => t.done).length;
-  const total = topics.length;
+  const completed = phase.topics.filter((t) => completedIds.has(t.id)).length;
+  const total = phase.topics.length;
   const pct = Math.round((completed / total) * 100);
 
-  const toggleTopic = (id: string) => {
-    setTopics((prev) => prev.map((t) => t.id === id ? { ...t, done: !t.done } : t));
-  };
+  const toggleTopic = (id: string) => onToggle(id);
 
   return (
     <div className={`bg-[#08080e] border border-zinc-800/60 rounded-2xl overflow-hidden transition-all duration-300 hover:border-zinc-700/60 ${open ? phase.glow : ""}`}>
@@ -199,22 +200,24 @@ function PhaseCard({ phase }: { phase: Phase }) {
       {/* Topics */}
       {open && (
         <div className="border-t border-zinc-800/60 divide-y divide-zinc-800/40">
-          {topics.map((topic) => (
+          {phase.topics.map((topic) => {
+            const done = completedIds.has(topic.id);
+            return (
             <div
               key={topic.id}
               className={`px-6 py-4 flex items-start gap-4 transition-all duration-200 ${
-                topic.done ? "opacity-50" : "hover:bg-zinc-900/30"
+                done ? "opacity-50" : "hover:bg-zinc-900/30"
               }`}
             >
               <button onClick={() => toggleTopic(topic.id)} className="mt-0.5 shrink-0">
-                {topic.done
+                {done
                   ? <CheckCircle2 size={16} className={phase.color} />
                   : <Circle size={16} className="text-zinc-700 hover:text-zinc-500 transition-colors" />
                 }
               </button>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap mb-1">
-                  <span className={`text-sm font-medium ${topic.done ? "line-through text-zinc-600" : "text-zinc-200"}`}>
+                  <span className={`text-sm font-medium ${done ? "line-through text-zinc-600" : "text-zinc-200"}`}>
                     {topic.title}
                   </span>
                   {topic.japanese && (
@@ -232,7 +235,8 @@ function PhaseCard({ phase }: { phase: Phase }) {
                 )}
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
@@ -243,9 +247,27 @@ function PhaseCard({ phase }: { phase: Phase }) {
 
 export default function JapaneseSenseiPage() {
   const [activeTab, setActiveTab] = useState<"roadmap" | "routine" | "resources">("roadmap");
+  const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
 
-  const totalTopics = ROADMAP.flatMap((p) => p.topics).length;
-  const completedTopics = 0; // wire to real state later
+  const totalTopics     = ROADMAP.flatMap((p) => p.topics).length;
+  const completedTopics = completedIds.size;
+
+  // Load from localStorage on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("jp-sensei-progress");
+      if (saved) setCompletedIds(new Set(JSON.parse(saved)));
+    } catch {}
+  }, []);
+
+  const handleToggle = (id: string) => {
+    setCompletedIds((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      localStorage.setItem("jp-sensei-progress", JSON.stringify([...next]));
+      return next;
+    });
+  };
 
   return (
     <div className="max-w-[1100px] mx-auto space-y-8 animate-in fade-in duration-700">
@@ -311,7 +333,7 @@ export default function JapaneseSenseiPage() {
             Click each phase to expand. Check off topics as you complete them.
           </p>
           {ROADMAP.map((phase) => (
-            <PhaseCard key={phase.id} phase={phase} />
+            <PhaseCard key={phase.id} phase={phase} completed={completedIds} onToggle={handleToggle} />
           ))}
         </div>
       )}

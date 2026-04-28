@@ -205,6 +205,7 @@ export default function InterviewSessionPage() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
+  const [finalScore, setFinalScore] = useState<number | null>(null);
   const [questionCount, setQuestionCount] = useState(0);
   const [autoSpeak, setAutoSpeak] = useState(true);
   const [started, setStarted] = useState(false);
@@ -263,7 +264,10 @@ export default function InterviewSessionPage() {
           };
           setMessages((prev) => [...prev, aiMsg]);
           setQuestionCount((p) => p + 1);
-          if (data.isComplete) setIsComplete(true);
+          if (data.isComplete) {
+            setIsComplete(true);
+            if (data.score !== null && data.score !== undefined) setFinalScore(data.score);
+          }
           if (autoSpeak || mode === "voice") speak(data.reply);
         }
       } catch (e) {
@@ -422,9 +426,30 @@ export default function InterviewSessionPage() {
           <h2 className="text-2xl font-bold text-white mb-2">
             Interview Complete!
           </h2>
-          <p className="text-[#7A7A9A] text-sm mb-8">
+          <p className="text-[#7A7A9A] text-sm mb-4">
             Great job, {candidateName}.
           </p>
+
+          {/* Score badge */}
+          {finalScore !== null && (
+            <div className="flex items-center justify-center gap-3 mb-6">
+              <div className={`text-5xl font-black ${
+                finalScore >= 75 ? "text-emerald-400" :
+                finalScore >= 50 ? "text-amber-400" : "text-red-400"
+              }`}>
+                {finalScore}
+              </div>
+              <div className="text-left">
+                <div className="text-xs text-[#7A7A9A] font-medium">out of 100</div>
+                <div className={`text-xs font-bold ${
+                  finalScore >= 75 ? "text-emerald-400" :
+                  finalScore >= 50 ? "text-amber-400" : "text-red-400"
+                }`}>
+                  {finalScore >= 75 ? "Strong Performance" : finalScore >= 50 ? "Good Effort" : "Keep Practising"}
+                </div>
+              </div>
+            </div>
+          )}
           {messages.length > 0 && (
             <div className="bg-[#12121a] border border-[#272731] rounded-xl p-5 mb-8 text-left">
               <div className="text-[10px] text-[#7A7A9A] mb-3 font-bold uppercase tracking-widest">
