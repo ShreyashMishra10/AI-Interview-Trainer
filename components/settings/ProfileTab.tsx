@@ -1,28 +1,63 @@
 "use client";
 
-import React, { useState, useRef } from "react";
-import { Check, Save, Camera } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { Check, Save, Camera, Loader2 } from "lucide-react";
 import { SettingSection } from "./SettingsUI";
 
 export function ProfileTab() {
-  const [name, setName]             = useState("Shreyash Mishra");
-  const [username, setUsername]     = useState("shreyash.dev");
-  const [bio, setBio]               = useState("Full-Stack Architect · Japanese learner · Building Kratya.AI");
-  const [saved, setSaved]           = useState(false);
+  const [name,       setName]       = useState("");
+  const [bio,        setBio]        = useState("");
   const [targetRole, setTargetRole] = useState("Full-Stack Developer");
   const [experience, setExperience] = useState("Mid (3–5 yrs)");
-  const [avatarUrl, setAvatarUrl]   = useState<string | null>(null);
+  const [email,      setEmail]      = useState("");
+  const [avatarUrl,  setAvatarUrl]  = useState<string | null>(null);
+  const [saved,      setSaved]      = useState(false);
+  const [loading,    setLoading]    = useState(true);
+  const [saving,     setSaving]     = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const handleSave = () => {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+  useEffect(() => {
+    fetch("/api/profile")
+      .then((r) => r.json())
+      .then((d) => {
+        setName(d.full_name  ?? "");
+        setEmail(d.email     ?? "");
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await fetch("/api/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ full_name: name }),
+      });
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) setAvatarUrl(URL.createObjectURL(file));
   };
+
+  const initials = name ? name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2) : "?";
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <Loader2 size={20} className="animate-spin text-amber-400" />
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -33,7 +68,7 @@ export function ProfileTab() {
               <img src={avatarUrl} alt="Avatar" className="w-20 h-20 rounded-full object-cover border border-amber-400/20" />
             ) : (
               <div className="w-20 h-20 rounded-full bg-gradient-to-br from-amber-400/30 to-amber-600/30 border border-amber-400/20 flex items-center justify-center text-2xl font-bold text-amber-400">
-                S
+                {initials}
               </div>
             )}
             <div className="absolute inset-0 rounded-full bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -53,23 +88,31 @@ export function ProfileTab() {
 
       <SettingSection title="Personal Information">
         <div className="p-5 space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="text-[11px] text-zinc-600 font-bold uppercase tracking-widest block mb-2">Full Name</label>
-              <input value={name} onChange={(e) => setName(e.target.value)} className="w-full bg-[#0d0d16] border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-zinc-200 outline-none focus:border-amber-400/40 transition-colors" />
-            </div>
-            <div>
-              <label className="text-[11px] text-zinc-600 font-bold uppercase tracking-widest block mb-2">Username</label>
-              <input value={username} onChange={(e) => setUsername(e.target.value)} className="w-full bg-[#0d0d16] border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-zinc-200 outline-none focus:border-amber-400/40 transition-colors" />
-            </div>
+          <div>
+            <label className="text-[11px] text-zinc-600 font-bold uppercase tracking-widest block mb-2">Full Name</label>
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full bg-[#0d0d16] border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-zinc-200 outline-none focus:border-amber-400/40 transition-colors"
+            />
           </div>
           <div>
             <label className="text-[11px] text-zinc-600 font-bold uppercase tracking-widest block mb-2">Bio</label>
-            <textarea value={bio} onChange={(e) => setBio(e.target.value)} rows={3} className="w-full bg-[#0d0d16] border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-zinc-200 outline-none focus:border-amber-400/40 transition-colors resize-none" />
+            <textarea
+              value={bio}
+              onChange={(e) => setBio(e.target.value)}
+              rows={3}
+              placeholder="Tell us about yourself..."
+              className="w-full bg-[#0d0d16] border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-zinc-200 outline-none focus:border-amber-400/40 transition-colors resize-none"
+            />
           </div>
           <div>
             <label className="text-[11px] text-zinc-600 font-bold uppercase tracking-widest block mb-2">Email</label>
-            <input defaultValue="shreyash@dev.com" disabled className="w-full bg-[#0d0d16] border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-zinc-500 outline-none cursor-not-allowed" />
+            <input
+              value={email}
+              disabled
+              className="w-full bg-[#0d0d16] border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-zinc-500 outline-none cursor-not-allowed"
+            />
             <p className="text-[10px] text-zinc-700 mt-1">Email is managed by Clerk authentication.</p>
           </div>
         </div>
@@ -102,8 +145,18 @@ export function ProfileTab() {
         </div>
       </SettingSection>
 
-      <button onClick={handleSave} className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold transition-all ${saved ? "bg-emerald-500/15 border border-emerald-500/30 text-emerald-400" : "bg-amber-400/15 border border-amber-400/25 text-amber-400 hover:bg-amber-400/20"}`}>
-        {saved ? <><Check size={15} /> Saved!</> : <><Save size={15} /> Save Changes</>}
+      <button
+        onClick={handleSave}
+        disabled={saving}
+        className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+          saved
+            ? "bg-emerald-500/15 border border-emerald-500/30 text-emerald-400"
+            : "bg-amber-400/15 border border-amber-400/25 text-amber-400 hover:bg-amber-400/20"
+        }`}
+      >
+        {saving ? <><Loader2 size={15} className="animate-spin" /> Saving...</>
+         : saved ? <><Check size={15} /> Saved!</>
+         : <><Save size={15} /> Save Changes</>}
       </button>
     </div>
   );
