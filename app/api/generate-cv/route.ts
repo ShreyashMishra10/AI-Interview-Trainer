@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { getOrCreateProfile } from "@/lib/supabase/profile";
+import { rateLimit } from "@/lib/ratelimit";
 
 interface CVRequest {
   name:        string;
@@ -35,26 +36,42 @@ export async function POST(req: Request) {
     const { userId } = await auth();
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+    const { success } = rateLimit(`generate-cv:${userId}`, 5, 60_000);
+    if (!success)
+      return NextResponse.json({ error: "Too many requests. Please wait a minute." }, { status: 429 });
+
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) return NextResponse.json({ error: "API key missing" }, { status: 500 });
 
-    const data: CVRequest = await req.json();
+    const body = await req.json();
+    const data: CVRequest = {
+      name:        String(body.name        ?? "").trim().slice(0, 200),
+      email:       String(body.email       ?? "").trim().slice(0, 200),
+      bio:         String(body.bio         ?? "").trim().slice(0, 2000),
+      experience:  String(body.experience  ?? "").trim().slice(0, 5000),
+      projects:    String(body.projects    ?? "").trim().slice(0, 3000),
+      skills:      String(body.skills      ?? "").trim().slice(0, 1000),
+      target_role: String(body.target_role ?? "").trim().slice(0, 100),
+    };
 
-    // Ensure profile exists
-    await getOrCreateProfile(userId);
+    if (!data.name || !data.target_role)
+      return NextResponse.json({ error: "name and target_role are required" }, { status: 400 });
 
-    // Check free plan CV credit limit
-    const { data: profile } = await supabaseAdmin
-      .from("profiles")
-      .select("plan, cv_credits")
-      .eq("clerk_user_id", userId)
-      .single();
+    // Ensure profile exists and get plan
+    const profile = await getOrCreateProfile(userId);
 
-    if (profile?.plan === "free" && profile.cv_credits <= 0) {
-      return NextResponse.json(
-        { error: "CV generation limit reached. Upgrade to Pro." },
-        { status: 403 }
+    // Free plan: atomically decrement credit (fails if already 0)
+    if (profile?.plan === "free") {
+      const { data: granted, error: rpcError } = await supabaseAdmin.rpc(
+        "decrement_cv_credits",
+        { p_user_id: userId }
       );
+      if (rpcError) return NextResponse.json({ error: rpcError.message }, { status: 500 });
+      if (!granted)
+        return NextResponse.json(
+          { error: "CV generation limit reached. Upgrade to Pro." },
+          { status: 403 }
+        );
     }
 
     // Generate CV with Gemini
@@ -92,37 +109,28 @@ REQUIREMENTS:
       return NextResponse.json({ error: "AI returned invalid JSON. Please try again." }, { status: 500 });
     }
 
-    // Save to Supabase
+    // Save to Supabase — if save fails, surface the error (don't silently continue)
     const { data: saved, error: saveError } = await supabaseAdmin
       .from("cv_generations")
       .insert({
         clerk_user_id: userId,
-        target_role:   data.target_role ?? "Software Engineer",
+        target_role:   data.target_role || "Software Engineer",
         cv_data:       cvData,
       })
       .select()
       .single();
 
-    if (saveError) {
-      console.error("Failed to save CV:", saveError.message);
-    }
-
-    // Deduct CV credit for free users
-    if (profile?.plan === "free") {
-      await supabaseAdmin
-        .from("profiles")
-        .update({ cv_credits: profile.cv_credits - 1 })
-        .eq("clerk_user_id", userId);
-    }
+    if (saveError)
+      return NextResponse.json({ error: "Failed to save CV. Please try again." }, { status: 500 });
 
     return NextResponse.json({
       result: aiText,
-      cv_id:  saved?.id ?? null,
+      cv_id:  saved.id,
     });
 
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : "Internal Server Error";
     console.error("CV Generation Error:", msg);
-    return NextResponse.json({ error: msg }, { status: 500 });
+    return NextResponse.json({ error: "Something went wrong. Please try again." }, { status: 500 });
   }
 }

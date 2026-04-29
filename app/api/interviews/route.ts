@@ -2,6 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { rateLimit } from "@/lib/ratelimit";
 
 interface Message {
   role: "user" | "assistant";
@@ -38,6 +39,10 @@ export async function POST(req: Request) {
   try {
     const { userId } = await auth();
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const { success } = rateLimit(`interviews:${userId}`, 30, 60_000);
+    if (!success)
+      return NextResponse.json({ error: "Too many requests. Please slow down." }, { status: 429 });
 
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) return NextResponse.json({ error: "API key missing" }, { status: 500 });
