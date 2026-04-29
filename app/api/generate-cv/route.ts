@@ -98,8 +98,11 @@ REQUIREMENTS:
 - "skills": object with keys "technical" (array), "soft" (array), "languages" (array)
 - Use quantified achievements where possible (e.g., "Reduced load time by 40%")`;
 
-    const result = await model.generateContent(prompt);
-    const aiText = result.response.text().replace(/```json|```/g, "").trim();
+    const timeout = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error("AI response timed out. Please try again.")), 30_000)
+    );
+    const result  = await Promise.race([model.generateContent(prompt), timeout]);
+    const aiText  = result.response.text().replace(/```json|```/g, "").trim();
 
     // Parse and validate JSON
     let cvData: Record<string, unknown>;

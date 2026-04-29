@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, memo } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useVoice } from "@/hooks/useVoice";
 import {
@@ -155,7 +155,7 @@ function AIOrb({
 }
 
 // ── Message Bubble ────────────────────────────────────────────────────────────
-function MessageBubble({ message }: { message: Message }) {
+const MessageBubble = memo(function MessageBubble({ message }: { message: Message }) {
   const isUser = message.role === "user";
   return (
     <div className={`flex gap-2.5 ${isUser ? "flex-row-reverse" : "flex-row"}`}>
@@ -187,7 +187,7 @@ function MessageBubble({ message }: { message: Message }) {
       </div>
     </div>
   );
-}
+});
 
 // ── Main Page ─────────────────────────────────────────────────────────────────
 export default function InterviewSessionPage() {
@@ -642,8 +642,8 @@ export default function InterviewSessionPage() {
                 </div>
               </div>
             )}
-            {messages.map((msg, i) => (
-              <MessageBubble key={i} message={msg} />
+            {messages.map((msg) => (
+              <MessageBubble key={`${msg.role}-${msg.timestamp.getTime()}`} message={msg} />
             ))}
             {isLoading && messages.length > 0 && (
               <div className="flex gap-2.5">

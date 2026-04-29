@@ -60,7 +60,7 @@ export function useVoice({ onTranscript }: UseVoiceOptions) {
       setTranscript(finalTranscript || interimTranscript);
 
       if (finalTranscript) {
-        onTranscript(finalTranscript.trim());
+        onTranscript(finalTranscript.trim().slice(0, 1000));
       }
     };
 

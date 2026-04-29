@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { Sidebar } from "@/components/sidebar";
 import { Search, Bell, Menu, X, Mic2, FileText, Clock, ChevronRight } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
+import { ThemeProvider } from "@/components/ui/theme-provider";
 import "./global.css";
 
 /* ── Types ─────────────────────────────────────────────────── */
@@ -259,6 +260,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }, []);
 
   return (
+    <ThemeProvider forcedTheme="dark" attribute="class" disableTransitionOnChange>
     <div className="flex h-screen bg-background overflow-hidden selection:bg-gold-accent/30">
       {!isSessionPage && (
         <Sidebar
@@ -342,5 +344,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         />
       )}
     </div>
+    </ThemeProvider>
   );
 }

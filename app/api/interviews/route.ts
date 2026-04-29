@@ -81,8 +81,12 @@ INTERVIEW RULES:
 
     const lastMessage = messages[messages.length - 1]?.content ?? "";
 
-    const chat   = model.startChat({ history });
-    const result = await chat.sendMessage(lastMessage);
+    const chat = model.startChat({ history });
+
+    const timeout = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error("AI response timed out. Please try again.")), 30_000)
+    );
+    const result  = await Promise.race([chat.sendMessage(lastMessage), timeout]);
     const rawText = result.response.text();
 
     // Extract score from final message (e.g. "SCORE: 78/100")
