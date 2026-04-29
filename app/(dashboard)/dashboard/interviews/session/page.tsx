@@ -209,6 +209,7 @@ export default function InterviewSessionPage() {
   const [questionCount, setQuestionCount] = useState(0);
   const [autoSpeak, setAutoSpeak] = useState(true);
   const [started, setStarted] = useState(false);
+  const [confirmEnd, setConfirmEnd] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const {
@@ -535,18 +536,36 @@ export default function InterviewSessionPage() {
             }
           </div>
 
-          {/* End Interview button */}
-          <button
-            onClick={async () => {
-              if (sessionId) {
-                await fetch(`/api/interviews/sessions/${sessionId}`, { method: "PATCH" });
-              }
-              setIsComplete(true);
-            }}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition text-xs font-semibold"
-          >
-            End Interview
-          </button>
+          {/* End Interview button — two-step confirm */}
+          {confirmEnd ? (
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={async () => {
+                  setConfirmEnd(false);
+                  if (sessionId) {
+                    await fetch(`/api/interviews/sessions/${sessionId}`, { method: "PATCH" });
+                  }
+                  setIsComplete(true);
+                }}
+                className="px-3 py-1.5 rounded-lg bg-red-500 text-white text-xs font-semibold hover:bg-red-400 transition"
+              >
+                Yes, end
+              </button>
+              <button
+                onClick={() => setConfirmEnd(false)}
+                className="px-3 py-1.5 rounded-lg bg-[#1c1c26] border border-[#272731] text-[#7A7A9A] text-xs font-semibold hover:text-white transition"
+              >
+                Cancel
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setConfirmEnd(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition text-xs font-semibold"
+            >
+              End Interview
+            </button>
+          )}
         </div>
       </div>
 

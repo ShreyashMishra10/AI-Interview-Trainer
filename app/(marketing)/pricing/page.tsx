@@ -67,7 +67,7 @@ const PLANS = [
       "SLA & compliance support",
     ],
     cta: "Contact Us",
-    href: "/about",
+    href: "mailto:shreyashmishra9044@gmail.com?subject=Enterprise%20Plan%20Enquiry",
     highlight: false,
     icon: <Crown size={16} />,
     savings: "Save ₹4,800/yr",

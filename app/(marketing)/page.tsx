@@ -6,7 +6,7 @@ import { Footer } from "@/components/Footer";
 import { Reveal } from "@/components/Reveal";
 import {
   Mic2, FileText, Languages, BarChart3, Radio, Zap,
-  ArrowRight, Star, Users, BookOpen, Trophy,
+  ArrowRight, Star, BookOpen, Trophy,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -51,10 +51,10 @@ export const metadata: Metadata = {
 
 /* ── Static data (server-safe) ─────────────────────────────── */
 const STATS = [
-  { icon: <Users   size={20} aria-hidden />, value: "10K+", label: "Interviews Done"   },
-  { icon: <BookOpen size={20} aria-hidden />, value: "500+", label: "Mock Scenarios"    },
-  { icon: <Trophy  size={20} aria-hidden />, value: "20+",  label: "Job Roles Covered" },
-  { icon: <Star    size={20} aria-hidden />, value: "4.9★", label: "User Rating"       },
+  { icon: <Trophy   size={20} aria-hidden />, value: "20+",  label: "Job Roles Covered"    },
+  { icon: <BookOpen size={20} aria-hidden />, value: "10",   label: "Questions Per Session" },
+  { icon: <Mic2     size={20} aria-hidden />, value: "3",    label: "Practice Modes"        },
+  { icon: <Star     size={20} aria-hidden />, value: "100",  label: "Max Score Per Session" },
 ];
 
 const STEPS = [
@@ -120,26 +120,6 @@ const FEATURES = [
   },
 ];
 
-const TESTIMONIALS = [
-  {
-    quote: "The AI asked me exactly the kind of system design question I got in my Google round. I was genuinely prepared.",
-    name: "Ananya R.",
-    role: "SDE-2 @ Google",
-    initials: "AR",
-  },
-  {
-    quote: "I used the CV builder 30 minutes before uploading to LinkedIn. My profile visits tripled that week.",
-    name: "Karan M.",
-    role: "Frontend Dev @ Razorpay",
-    initials: "KM",
-  },
-  {
-    quote: "Voice mode is what sold me. Hearing yourself answer under pressure is a completely different practice experience.",
-    name: "Priya S.",
-    role: "Full-Stack Dev @ Swiggy",
-    initials: "PS",
-  },
-];
 
 const MARQUEE_ITEMS = [
   "React", "Next.js", "Node.js", "MongoDB", "DSA",
@@ -227,16 +207,6 @@ export default async function Home() {
             )}
           </div>
 
-          {/* Trust line */}
-          <p
-            className="animate-reveal text-xs text-muted-foreground pt-1"
-            style={{ animationDelay: "550ms" }}
-          >
-            Trusted by developers at{" "}
-            <span className="text-foreground font-semibold">Google</span>,{" "}
-            <span className="text-foreground font-semibold">Razorpay</span> &{" "}
-            <span className="text-foreground font-semibold">Swiggy</span>
-          </p>
         </div>
 
         {/* Right: live demo — only shown to logged-out users */}
@@ -370,52 +340,31 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* ── TESTIMONIALS ──────────────────────────────────── */}
-      <section aria-label="Testimonials" className="max-w-[1100px] mx-auto px-6 lg:px-20 py-24">
-        <Reveal className="mb-16">
-          <div className="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 rounded-full px-4 py-1.5 mb-5">
-            <Star size={12} className="text-amber-500" aria-hidden />
-            <span className="text-[11px] text-amber-500 font-bold uppercase tracking-widest">Testimonials</span>
+      {/* ── EARLY ACCESS CTA ──────────────────────────────────── */}
+      <section aria-label="Early access" className="max-w-[1100px] mx-auto px-6 lg:px-20 py-24">
+        <Reveal>
+          <div className="bg-white dark:bg-card border border-amber-500/20 rounded-3xl p-10 sm:p-14 text-center relative overflow-hidden shadow-sm dark:shadow-none">
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(251,191,36,0.05),transparent_70%)]" />
+            <div className="relative z-10">
+              <div className="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 rounded-full px-4 py-1.5 mb-6">
+                <Star size={12} className="text-amber-500" aria-hidden />
+                <span className="text-[11px] text-amber-500 font-bold uppercase tracking-widest">Early Access</span>
+              </div>
+              <h2 className="text-4xl lg:text-5xl font-bold tracking-tight leading-tight mb-4">
+                Be among the first<br />
+                <span className="text-amber-500">to train smarter.</span>
+              </h2>
+              <p className="text-muted-foreground text-base max-w-lg mx-auto mb-8 leading-relaxed">
+                AI-Trainer is just getting started. Sign up free today — your feedback shapes what we build next.
+              </p>
+              <Link href="/sign-up">
+                <Button className="h-12 px-10 text-base font-bold bg-amber-500 hover:bg-amber-400 text-black shadow-[0_0_24px_rgba(251,191,36,0.35)] transition-all">
+                  Start for Free →
+                </Button>
+              </Link>
+            </div>
           </div>
-          <h2 className="text-4xl lg:text-5xl font-bold tracking-tight leading-tight">
-            Real results from<br />
-            <span className="text-amber-500">real candidates.</span>
-          </h2>
         </Reveal>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {TESTIMONIALS.map((t, i) => (
-            <Reveal key={t.name} delay={i * 100}>
-              <figure className="bg-white dark:bg-card border border-zinc-200 dark:border-border rounded-2xl p-6 shadow-sm dark:shadow-none flex flex-col gap-4 hover:border-amber-500/20 hover:shadow-[0_4px_20px_rgba(0,0,0,0.05)] transition-all duration-300 h-full">
-                {/* Stars */}
-                <div className="flex gap-0.5" aria-label="5 star rating">
-                  {Array.from({ length: 5 }).map((_, j) => (
-                    <Star key={j} size={13} className="text-amber-500 fill-amber-500" aria-hidden />
-                  ))}
-                </div>
-
-                {/* Quote */}
-                <blockquote className="text-muted-foreground leading-relaxed flex-1 text-sm">
-                  &ldquo;{t.quote}&rdquo;
-                </blockquote>
-
-                {/* Author */}
-                <figcaption className="flex items-center gap-3 pt-3 border-t border-zinc-100 dark:border-border">
-                  <div
-                    className="w-8 h-8 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-[10px] font-bold text-amber-500"
-                    aria-hidden
-                  >
-                    {t.initials}
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold tracking-tight text-foreground">{t.name}</p>
-                    <p className="text-xs text-muted-foreground">{t.role}</p>
-                  </div>
-                </figcaption>
-              </figure>
-            </Reveal>
-          ))}
-        </div>
       </section>
 
       <Footer />
