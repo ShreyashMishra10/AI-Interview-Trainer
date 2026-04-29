@@ -6,6 +6,7 @@ import {
   Code2, Rocket, Briefcase, UserCircle, Target,
   Clock, ChevronRight, Loader2, X,
 } from "lucide-react";
+import { toast } from "sonner";
 
 /* ── Types ─────────────────────────────────────────────────── */
 interface CVData {
@@ -207,10 +208,12 @@ export default function AICVBuilder() {
       const parsed     = JSON.parse(jsonString);
       setAiResult(parsed);
       setShowPreview(true);
-      // Refresh history
+      toast.success("CV generated successfully!");
       fetch("/api/generate-cv").then((r) => r.json()).then((d) => setHistory(Array.isArray(d) ? d : []));
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : "Generation failed. Try again.");
+      const msg = e instanceof Error ? e.message : "Generation failed. Try again.";
+      setError(msg);
+      toast.error(msg);
     } finally {
       setIsGenerating(false);
     }

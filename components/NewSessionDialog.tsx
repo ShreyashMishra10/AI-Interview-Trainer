@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 const ROLES = [
   { group: "Frontend",       options: [{ value: "Frontend Developer (React)", label: "Frontend Developer (React)" }, { value: "Frontend Developer (Vue / Angular)", label: "Frontend Developer (Vue / Angular)" }, { value: "UI/UX Engineer", label: "UI/UX Engineer" }] },
@@ -46,6 +47,8 @@ export default function NewSessionDialog({ isOpen, onClose }: NewSessionDialogPr
         if (parseRes.ok) {
           const parsed = await parseRes.json();
           cvContext = parsed.text || "";
+        } else {
+          toast.warning("CV couldn't be parsed — starting without it. Questions won't be CV-specific.");
         }
       }
 

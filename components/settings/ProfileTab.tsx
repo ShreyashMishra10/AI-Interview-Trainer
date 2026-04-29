@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Check, Save, Camera, Loader2 } from "lucide-react";
 import { SettingSection } from "./SettingsUI";
+import { toast } from "sonner";
 
 export function ProfileTab() {
   const [name,       setName]       = useState("");
@@ -30,15 +31,22 @@ export function ProfileTab() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      await fetch("/api/profile", {
+      const res = await fetch("/api/profile", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ full_name: name }),
       });
-      setSaved(true);
-      setTimeout(() => setSaved(false), 2500);
+      if (!res.ok) {
+        const data = await res.json();
+        toast.error(data.error || "Failed to save profile.");
+      } else {
+        setSaved(true);
+        setTimeout(() => setSaved(false), 2500);
+        toast.success("Profile saved.");
+      }
     } catch (e) {
       console.error(e);
+      toast.error("Something went wrong. Please try again.");
     } finally {
       setSaving(false);
     }

@@ -31,19 +31,18 @@ function timeAgo(dateStr: string) {
 }
 
 /* ── Search Modal ──────────────────────────────────────────── */
-function SearchModal({ onClose }: { onClose: () => void }) {
-  const [query, setQuery]       = useState("");
-  const [sessions, setSessions] = useState<Session[]>([]);
-  const router = useRouter();
+function SearchModal({
+  onClose,
+  sessions,
+}: {
+  onClose:  () => void;
+  sessions: Session[];
+}) {
+  const [query, setQuery] = useState("");
+  const router   = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    inputRef.current?.focus();
-    fetch("/api/interviews")
-      .then((r) => r.json())
-      .then((d) => setSessions(Array.isArray(d) ? d : []))
-      .catch(console.error);
-  }, []);
+  useEffect(() => { inputRef.current?.focus(); }, []);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
@@ -58,16 +57,15 @@ function SearchModal({ onClose }: { onClose: () => void }) {
   const navigate = (path: string) => { onClose(); router.push(path); };
 
   const QUICK = [
-    { label: "Start new interview",  icon: <Mic2 size={14} />,  path: "/dashboard/interviews" },
-    { label: "Generate a CV",        icon: <FileText size={14} />, path: "/dashboard/cv-builder"  },
-    { label: "View all sessions",    icon: <Clock size={14} />,  path: "/dashboard/interviews" },
+    { label: "Start new interview", icon: <Mic2 size={14} />,     path: "/dashboard/interviews" },
+    { label: "Generate a CV",       icon: <FileText size={14} />, path: "/dashboard/cv-builder" },
+    { label: "View all sessions",   icon: <Clock size={14} />,    path: "/dashboard/interviews" },
   ];
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-start justify-center pt-24 px-4" onClick={onClose}>
       <div className="w-full max-w-xl bg-zinc-900 border border-zinc-700 rounded-2xl overflow-hidden shadow-2xl" onClick={(e) => e.stopPropagation()}>
 
-        {/* Input */}
         <div className="flex items-center gap-3 px-4 py-3 border-b border-zinc-800">
           <Search size={16} className="text-zinc-500 shrink-0" />
           <input
@@ -83,7 +81,6 @@ function SearchModal({ onClose }: { onClose: () => void }) {
         </div>
 
         <div className="max-h-[420px] overflow-y-auto">
-          {/* Quick actions — shown when no query */}
           {!query && (
             <div className="p-2">
               <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest px-3 py-2">Quick Actions</p>
@@ -98,7 +95,6 @@ function SearchModal({ onClose }: { onClose: () => void }) {
             </div>
           )}
 
-          {/* Session results */}
           {query && (
             <div className="p-2">
               <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest px-3 py-2">
@@ -108,7 +104,7 @@ function SearchModal({ onClose }: { onClose: () => void }) {
                 <p className="text-zinc-600 text-sm text-center py-8">No sessions found for &ldquo;{query}&rdquo;</p>
               ) : (
                 filtered.map((s) => (
-                  <button key={s.id} onClick={() => navigate("/dashboard/interviews")}
+                  <button key={s.id} onClick={() => navigate(`/dashboard/interviews/${s.id}`)}
                     className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-zinc-800 transition-colors text-left group">
                     <div className="w-7 h-7 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">
                       <Mic2 size={12} className="text-amber-500" />
@@ -139,48 +135,42 @@ function SearchModal({ onClose }: { onClose: () => void }) {
 }
 
 /* ── Notifications Dropdown ────────────────────────────────── */
-function NotificationsDropdown({ onClose }: { onClose: () => void }) {
-  const [sessions, setSessions] = useState<Session[]>([]);
-  const [cvs,      setCVs]      = useState<CV[]>([]);
-  const [loading,  setLoading]  = useState(true);
+function NotificationsDropdown({
+  onClose,
+  sessions,
+  cvs,
+}: {
+  onClose:  () => void;
+  sessions: Session[];
+  cvs:      CV[];
+}) {
   const router = useRouter();
-  const ref = useRef<HTMLDivElement>(null);
+  const ref    = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    Promise.all([
-      fetch("/api/interviews").then((r) => r.json()),
-      fetch("/api/generate-cv").then((r) => r.json()),
-    ])
-      .then(([s, c]) => {
-        setSessions(Array.isArray(s) ? s.slice(0, 4) : []);
-        setCVs(Array.isArray(c) ? c.slice(0, 2) : []);
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, []);
-
-  useEffect(() => {
-    const handler = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) onClose(); };
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) onClose();
+    };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, [onClose]);
 
   const items = [
-    ...sessions.map((s) => ({
-      icon:    <Mic2 size={13} className="text-amber-500" />,
-      bg:      "bg-amber-500/10 border-amber-500/20",
-      title:   s.job_role,
-      sub:     s.status === "completed" ? `Completed · Score: ${s.score ?? "—"}` : "In Progress",
-      time:    timeAgo(s.created_at),
-      path:    "/dashboard/interviews",
+    ...sessions.slice(0, 4).map((s) => ({
+      icon:  <Mic2 size={13} className="text-amber-500" />,
+      bg:    "bg-amber-500/10 border-amber-500/20",
+      title: s.job_role,
+      sub:   s.status === "completed" ? `Completed · Score: ${s.score ?? "—"}` : "In Progress",
+      time:  timeAgo(s.created_at),
+      path:  s.status === "completed" ? `/dashboard/interviews/${s.id}` : "/dashboard/interviews",
     })),
-    ...cvs.map((c) => ({
-      icon:    <FileText size={13} className="text-emerald-500" />,
-      bg:      "bg-emerald-500/10 border-emerald-500/20",
-      title:   `CV — ${c.target_role || "General"}`,
-      sub:     "CV generated",
-      time:    timeAgo(c.created_at),
-      path:    "/dashboard/cv-builder",
+    ...cvs.slice(0, 2).map((c) => ({
+      icon:  <FileText size={13} className="text-emerald-500" />,
+      bg:    "bg-emerald-500/10 border-emerald-500/20",
+      title: `CV — ${c.target_role || "General"}`,
+      sub:   "CV generated",
+      time:  timeAgo(c.created_at),
+      path:  "/dashboard/cv-builder",
     })),
   ];
 
@@ -192,9 +182,7 @@ function NotificationsDropdown({ onClose }: { onClose: () => void }) {
       </div>
 
       <div className="max-h-[360px] overflow-y-auto">
-        {loading ? (
-          <p className="text-zinc-600 text-xs text-center py-8">Loading...</p>
-        ) : items.length === 0 ? (
+        {items.length === 0 ? (
           <div className="text-center py-10">
             <Bell size={24} className="text-zinc-700 mx-auto mb-2" />
             <p className="text-zinc-600 text-xs">No activity yet.</p>
@@ -240,7 +228,23 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [searchOpen,       setSearchOpen]       = useState(false);
   const [notifOpen,        setNotifOpen]        = useState(false);
 
+  // Fetched once on mount — shared by SearchModal and NotificationsDropdown
+  const [sessions, setSessions] = useState<Session[]>([]);
+  const [cvs,      setCVs]      = useState<CV[]>([]);
+
   const isSessionPage = pathname.includes("/session");
+
+  useEffect(() => {
+    Promise.all([
+      fetch("/api/interviews").then((r) => r.json()),
+      fetch("/api/generate-cv").then((r) => r.json()),
+    ])
+      .then(([s, c]) => {
+        setSessions(Array.isArray(s) ? s : []);
+        setCVs(Array.isArray(c) ? c : []);
+      })
+      .catch(console.error);
+  }, []);
 
   // Ctrl/Cmd+K shortcut for search
   useEffect(() => {
@@ -269,7 +273,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {!isSessionPage && (
           <header className="h-16 border-b border-zinc-800/50 flex items-center justify-between px-6 lg:px-8 bg-black/20 backdrop-blur-xl sticky top-0 z-40">
 
-            {/* Left: hamburger (mobile only) */}
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setSidebarOpen(true)}
@@ -280,7 +283,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </button>
             </div>
 
-            {/* Right: status + actions */}
             <div className="flex items-center gap-6">
               <div className="hidden sm:flex items-center gap-2.5 px-3 py-1.5 bg-zinc-900/40 border border-zinc-800/50 rounded-full">
                 <div className="relative flex h-2 w-2">
@@ -293,17 +295,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </div>
 
               <div className="flex items-center gap-3 border-l border-zinc-800 pl-6">
-                {/* Search */}
                 <button
                   onClick={() => setSearchOpen(true)}
                   aria-label="Search"
-                  className="text-zinc-500 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-zinc-800 group relative"
+                  className="text-zinc-500 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-zinc-800"
                   title="Search (Ctrl+K)"
                 >
                   <Search size={18} strokeWidth={1.5} />
                 </button>
 
-                {/* Bell */}
                 <div className="relative">
                   <button
                     onClick={() => setNotifOpen((v) => !v)}
@@ -311,9 +311,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     className="text-zinc-500 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-zinc-800 relative"
                   >
                     <Bell size={18} strokeWidth={1.5} />
-                    <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-amber-500 rounded-full border border-black" />
+                    {(sessions.length > 0 || cvs.length > 0) && (
+                      <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-amber-500 rounded-full border border-black" />
+                    )}
                   </button>
-                  {notifOpen && <NotificationsDropdown onClose={() => setNotifOpen(false)} />}
+                  {notifOpen && (
+                    <NotificationsDropdown
+                      onClose={() => setNotifOpen(false)}
+                      sessions={sessions}
+                      cvs={cvs}
+                    />
+                  )}
                 </div>
               </div>
             </div>
@@ -327,8 +335,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </main>
       </div>
 
-      {/* Search modal */}
-      {searchOpen && <SearchModal onClose={() => setSearchOpen(false)} />}
+      {searchOpen && (
+        <SearchModal
+          onClose={() => setSearchOpen(false)}
+          sessions={sessions}
+        />
+      )}
     </div>
   );
 }

@@ -4,7 +4,7 @@ import { supabaseAdmin } from "@/lib/supabase/admin";
 
 // PATCH /api/interviews/sessions/[id] — mark session completed
 export async function PATCH(
-  req: NextRequest,
+  _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { userId } = await auth();
@@ -12,16 +12,19 @@ export async function PATCH(
 
   const { id } = await params;
 
-  const { error } = await supabaseAdmin
+  const { data, error } = await supabaseAdmin
     .from("interview_sessions")
     .update({
       status:       "completed",
       completed_at: new Date().toISOString(),
     })
     .eq("id", id)
-    .eq("clerk_user_id", userId); // ensure ownership
+    .eq("clerk_user_id", userId)
+    .select("id");
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (!data || data.length === 0)
+    return NextResponse.json({ error: "Session not found" }, { status: 404 });
 
   return NextResponse.json({ success: true });
 }
