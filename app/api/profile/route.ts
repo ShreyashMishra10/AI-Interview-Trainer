@@ -40,8 +40,10 @@ export async function PATCH(req: NextRequest) {
   const body = await req.json();
 
   const allowedFields: Record<string, unknown> = {};
-  if (typeof body.full_name === "string") allowedFields.full_name = body.full_name.trim().slice(0, 200);
-  if (typeof body.email     === "string") allowedFields.email     = body.email.trim().slice(0, 200);
+  if (typeof body.full_name          === "string") allowedFields.full_name          = body.full_name.trim().slice(0, 200);
+  if (typeof body.email              === "string") allowedFields.email              = body.email.trim().slice(0, 200);
+  if (body.notification_prefs !== undefined)       allowedFields.notification_prefs = body.notification_prefs;
+  if (body.privacy_prefs      !== undefined)       allowedFields.privacy_prefs      = body.privacy_prefs;
 
   if (Object.keys(allowedFields).length === 0)
     return NextResponse.json({ error: "No valid fields to update" }, { status: 400 });
