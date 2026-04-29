@@ -1,7 +1,7 @@
 "use client";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { UserButton } from "@clerk/nextjs";
+import { UserButton, useUser } from "@clerk/nextjs";
 import {
   LayoutDashboard, Mic2, Languages, FileText,
   Settings, X, ChevronLeft, ChevronRight, ArrowLeft,
@@ -55,6 +55,9 @@ function SidebarContent({
   onClose?: () => void;
 }) {
   const pathname = usePathname();
+  const { user } = useUser();
+  const displayName = user?.fullName ?? user?.firstName ?? "User";
+  const displayEmail = user?.primaryEmailAddress?.emailAddress ?? "";
 
   return (
     <div className="flex flex-col h-full">
@@ -123,8 +126,8 @@ function SidebarContent({
           </div>
           {!collapsed && (
             <div className="flex flex-col min-w-0">
-              <span className="text-[11px] font-bold text-zinc-200 uppercase tracking-tight truncate">Shreyash</span>
-              <span className="text-[9px] text-zinc-500 font-medium">Full-Stack Architect</span>
+              <span className="text-[11px] font-bold text-zinc-200 uppercase tracking-tight truncate">{displayName}</span>
+              <span className="text-[9px] text-zinc-500 font-medium truncate">{displayEmail}</span>
             </div>
           )}
         </div>

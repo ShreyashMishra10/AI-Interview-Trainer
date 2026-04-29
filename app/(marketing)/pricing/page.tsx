@@ -178,7 +178,7 @@ export default function PricingPage() {
 
         {/* ── Plan cards ── */}
         <section>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 items-start">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 items-stretch">
             {PLANS.map((plan) => {
               const price  = annual ? plan.annualPrice  : plan.monthlyPrice;
               const period = annual ? plan.annualPeriod : plan.period;

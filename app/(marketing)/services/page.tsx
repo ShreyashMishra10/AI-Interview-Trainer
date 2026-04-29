@@ -42,7 +42,7 @@ export default function ServicesPage() {
             <h2 className="text-2xl font-serif text-foreground mb-2">Simple, Transparent Pricing</h2>
             <p className="text-muted-foreground text-sm font-medium">No hidden fees. Cancel anytime.</p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 items-start">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 items-stretch">
             {PLANS.map((plan) => (
               <PlanCard key={plan.name} plan={plan} />
             ))}

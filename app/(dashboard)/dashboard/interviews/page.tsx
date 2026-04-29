@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import NewSessionDialog from "@/components/NewSessionDialog";
 import { Mic2, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 
@@ -86,6 +87,7 @@ function SessionCard({ session, onClick }: { session: Session; onClick: () => vo
 }
 
 export default function InterviewsPage() {
+  const router = useRouter();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [sessions, setSessions]         = useState<Session[]>([]);
   const [loading, setLoading]           = useState(true);
@@ -172,6 +174,8 @@ export default function InterviewsPage() {
                 if (s.status === "in_progress") {
                   const params = new URLSearchParams({ role: s.job_role, experience: s.experience_level, sessionId: s.id, name: "You" });
                   window.location.href = `/dashboard/interviews/session?${params.toString()}`;
+                } else if (s.status === "completed") {
+                  router.push(`/dashboard/interviews/${s.id}`);
                 }
               }}
             />
