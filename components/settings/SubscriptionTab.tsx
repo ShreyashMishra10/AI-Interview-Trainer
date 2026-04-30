@@ -198,8 +198,9 @@ export function SubscriptionTab() {
 
       {/* Billing history */}
       <SettingSection title="Billing History">
-        <div className="px-5 py-4 text-sm text-zinc-600 text-center">
-          {isPaid ? "Billing history will appear here." : "No billing history — you are on the free plan."}
+        <div className="px-5 py-8 flex flex-col items-center text-center gap-2">
+          <p className="text-sm text-zinc-500 font-medium">Payment integration coming soon.</p>
+          <p className="text-xs text-zinc-700">Once Razorpay is connected, your invoices and receipts will appear here.</p>
         </div>
       </SettingSection>
     </div>

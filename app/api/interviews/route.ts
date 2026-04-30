@@ -48,7 +48,11 @@ export async function POST(req: Request) {
     if (!apiKey) return NextResponse.json({ error: "API key missing" }, { status: 500 });
 
     const body: InterviewRequest = await req.json();
-    const { messages, role, candidateName, experience, questionCount, sessionId, cvContext } = body;
+    const { role, candidateName, experience, questionCount, sessionId } = body;
+    // Cap messages to last 24 and trim each to 2000 chars to stay within token limits
+    const messages  = (Array.isArray(body.messages) ? body.messages.slice(-24) : [])
+      .map((m) => ({ ...m, content: String(m.content).slice(0, 2000) }));
+    const cvContext = typeof body.cvContext === "string" ? body.cvContext.slice(0, 3000) : "";
 
     const systemPrompt = `You are an expert technical interviewer conducting a real job interview for the role of "${role}".
 Candidate: ${candidateName}
