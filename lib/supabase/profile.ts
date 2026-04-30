@@ -1,4 +1,5 @@
 import { supabaseAdmin } from "./admin";
+import { sendWelcomeEmail } from "@/lib/email";
 
 export async function getOrCreateProfile(
   clerkUserId: string,
@@ -26,5 +27,14 @@ export async function getOrCreateProfile(
     .single();
 
   if (error) throw new Error(`Failed to create profile: ${error.message}`);
+
+  // Send welcome email on first sign-up (fire and forget)
+  if (email) {
+    sendWelcomeEmail({
+      to:   email,
+      name: fullName?.split(" ")[0] ?? "there",
+    }).catch((e) => console.error("Welcome email failed:", e));
+  }
+
   return created;
 }

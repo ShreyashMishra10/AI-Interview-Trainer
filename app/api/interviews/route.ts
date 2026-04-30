@@ -1,8 +1,9 @@
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { rateLimit } from "@/lib/ratelimit";
+import { sendSessionCompleteEmail } from "@/lib/email";
 
 interface Message {
   role: "user" | "assistant";
@@ -136,6 +137,29 @@ INTERVIEW RULES:
             ...(score !== null && { score }),
           })
           .eq("id", sessionId);
+
+        // Send session complete email if user has email notifications enabled
+        try {
+          const [user, { data: profile }] = await Promise.all([
+            currentUser(),
+            supabaseAdmin.from("profiles").select("notification_prefs").eq("clerk_user_id", userId).single(),
+          ]);
+          const emailEnabled = profile?.notification_prefs?.email !== false
+            && profile?.notification_prefs?.sessionComplete !== false;
+          const email = user?.emailAddresses?.[0]?.emailAddress;
+          if (email && emailEnabled) {
+            await sendSessionCompleteEmail({
+              to:        email,
+              name:      user?.firstName ?? "there",
+              jobRole:   role,
+              score,
+              sessionId,
+            });
+          }
+        } catch (emailErr) {
+          // Never fail the request because of email
+          console.error("Session complete email failed:", emailErr);
+        }
       }
     }
 

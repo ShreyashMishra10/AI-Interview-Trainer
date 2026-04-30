@@ -24,8 +24,10 @@ BEGIN
 END;
 $$;
 
--- Step 2: Schedule it to run every day at 2 AM UTC
--- Requires the pg_cron extension (enabled by default on Supabase)
+-- Step 2: Enable pg_cron extension (required for scheduling)
+CREATE EXTENSION IF NOT EXISTS pg_cron;
+
+-- Step 3: Schedule it to run every day at 2 AM UTC
 SELECT cron.schedule(
   'cleanup-stale-sessions',
   '0 2 * * *',
