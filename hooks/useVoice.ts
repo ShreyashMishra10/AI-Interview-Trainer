@@ -7,126 +7,117 @@ interface UseVoiceOptions {
 
 export function useVoice({ onTranscript }: UseVoiceOptions) {
   const [isListening, setIsListening] = useState(false);
-  const [isSpeaking, setIsSpeaking] = useState(false);
-  const [transcript, setTranscript] = useState("");
-  const [supported, setSupported] = useState(false);
+  const [isSpeaking,  setIsSpeaking]  = useState(false);
+  const [transcript,  setTranscript]  = useState("");
+  const [supported,   setSupported]   = useState(false);
 
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
-  const synthRef = useRef<SpeechSynthesis | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const recognitionRef  = useRef<any>(null);
+  const synthRef        = useRef<SpeechSynthesis | null>(null);
+  const shouldListenRef = useRef(false); // true while user wants mic on
+  const onTranscriptRef = useRef(onTranscript);
+
+  useEffect(() => { onTranscriptRef.current = onTranscript; }, [onTranscript]);
 
   useEffect(() => {
-    const hasSpeechRecognition =
-      typeof window !== "undefined" &&
-      ("SpeechRecognition" in window || "webkitSpeechRecognition" in window);
-    const hasSpeechSynthesis =
-      typeof window !== "undefined" && "speechSynthesis" in window;
-
-    setSupported(hasSpeechRecognition && hasSpeechSynthesis);
-
-    if (hasSpeechSynthesis) {
-      synthRef.current = window.speechSynthesis;
-    }
+    const hasSR = typeof window !== "undefined" &&
+      ("SpeechRecognition" in window || "webkitSpeechRecognition" in window as unknown as boolean);
+    const hasSS = typeof window !== "undefined" && "speechSynthesis" in window;
+    setSupported(hasSR && hasSS);
+    if (hasSS) synthRef.current = window.speechSynthesis;
   }, []);
 
-  const startListening = useCallback(() => {
-    if (!supported) return;
+  const createRecognition = useCallback(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const r  = new SR();
+    r.continuous      = true;
+    r.interimResults  = true;
+    r.lang            = "en-US";
 
-    const SpeechRecognition =
-      window.SpeechRecognition || window.webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
-
-    recognition.continuous = false;
-    recognition.interimResults = true;
-    recognition.lang = "en-US";
-
-    recognition.onstart = () => {
+    r.onstart = () => {
       setIsListening(true);
       setTranscript("");
     };
 
-    recognition.onresult = (event) => {
-      let finalTranscript = "";
-      let interimTranscript = "";
-
+    r.onresult = (event: SpeechRecognitionEvent) => {
+      let interim = "";
+      let final   = "";
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const t = event.results[i][0].transcript;
-        if (event.results[i].isFinal) {
-          finalTranscript += t;
-        } else {
-          interimTranscript += t;
-        }
+        if (event.results[i].isFinal) final  += t;
+        else                           interim += t;
       }
 
-      setTranscript(finalTranscript || interimTranscript);
+      // Show live transcript in bubble
+      setTranscript(interim || final);
 
-      if (finalTranscript) {
-        onTranscript(finalTranscript.trim().slice(0, 1000));
+      // Send each final phrase immediately
+      if (final.trim()) {
+        onTranscriptRef.current(final.trim().slice(0, 1000));
+        setTranscript(""); // Clear after sending
       }
     };
 
-    recognition.onend = () => {
+    r.onerror = (e: SpeechRecognitionErrorEvent) => {
+      if (e.error === "aborted" || e.error === "no-speech") return;
       setIsListening(false);
       setTranscript("");
     };
 
-    recognition.onerror = () => {
-      setIsListening(false);
-      setTranscript("");
+    r.onend = () => {
+      // Auto-restart with a FRESH instance — Chrome won't restart the same object
+      if (shouldListenRef.current) {
+        const next = createRecognition();
+        recognitionRef.current = next;
+        try { next.start(); } catch { /* already starting */ }
+      } else {
+        setIsListening(false);
+        setTranscript("");
+      }
     };
 
-    recognitionRef.current = recognition;
-    recognition.start();
-  }, [supported, onTranscript]);
-
-  const stopListening = useCallback(() => {
-    recognitionRef.current?.stop();
-    setIsListening(false);
+    return r;
   }, []);
 
-  const speak = useCallback(
-    (text: string, onEnd?: () => void) => {
-      if (!synthRef.current) return;
+  const startListening = useCallback(() => {
+    if (!supported) return;
+    shouldListenRef.current = true;
+    const r = createRecognition();
+    recognitionRef.current = r;
+    r.start();
+  }, [supported, createRecognition]);
 
-      synthRef.current.cancel();
+  const stopListening = useCallback(() => {
+    shouldListenRef.current = false;
+    recognitionRef.current?.stop();
+    recognitionRef.current = null;
+    setIsListening(false);
+    setTranscript("");
+  }, []);
 
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 0.95;
-      utterance.pitch = 1;
-      utterance.volume = 1;
-
-      const voices = synthRef.current.getVoices();
-      const preferred = voices.find(
-        (v) =>
-          v.lang.startsWith("en") &&
-          (v.name.includes("Google") || v.name.includes("Natural"))
-      );
-      if (preferred) utterance.voice = preferred;
-
-      utterance.onstart = () => setIsSpeaking(true);
-      utterance.onend = () => {
-        setIsSpeaking(false);
-        onEnd?.();
-      };
-      utterance.onerror = () => setIsSpeaking(false);
-
-      synthRef.current.speak(utterance);
-    },
-    []
-  );
+  const speak = useCallback((text: string, onEnd?: () => void) => {
+    if (!synthRef.current) return;
+    synthRef.current.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.rate   = 0.95;
+    u.pitch  = 1;
+    u.volume = 1;
+    const voices = synthRef.current.getVoices();
+    const preferred = voices.find(
+      (v) => v.lang.startsWith("en") && (v.name.includes("Google") || v.name.includes("Natural"))
+    );
+    if (preferred) u.voice = preferred;
+    u.onstart = () => setIsSpeaking(true);
+    u.onend   = () => { setIsSpeaking(false); onEnd?.(); };
+    u.onerror = () => setIsSpeaking(false);
+    synthRef.current.speak(u);
+  }, []);
 
   const stopSpeaking = useCallback(() => {
     synthRef.current?.cancel();
     setIsSpeaking(false);
   }, []);
 
-  return {
-    isListening,
-    isSpeaking,
-    transcript,
-    supported,
-    startListening,
-    stopListening,
-    speak,
-    stopSpeaking,
-  };
+  return { isListening, isSpeaking, transcript, supported, startListening, stopListening, speak, stopSpeaking };
 }

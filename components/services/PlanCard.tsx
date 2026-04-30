@@ -8,7 +8,7 @@ type Plan = (typeof PLANS)[0];
 
 export function PlanCard({ plan }: { plan: Plan }) {
   return (
-    <div className={`relative flex flex-col rounded-2xl border p-6 transition-all duration-300 bg-white shadow-md border-zinc-200 dark:bg-card dark:border-border dark:shadow-none ${
+    <div className={`relative flex flex-col rounded-2xl border p-6 transition-all duration-300 bg-white shadow-md border-zinc-200 dark:bg-card dark:border-border dark:shadow-none hover:-translate-y-2 hover:shadow-xl ${
       plan.highlight ? "ring-1 ring-amber-500/30 border-amber-500/30 dark:bg-amber-500/[0.03]" : ""
     }`}>
       {plan.highlight && (

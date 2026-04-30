@@ -98,7 +98,7 @@ export default function NewSessionDialog({ isOpen, onClose }: NewSessionDialogPr
           <div className="flex gap-2">
             <div className={`flex-1 h-[3px] rounded-full transition-all duration-300 ${name ? "bg-amber-500" : "bg-[#272731]"}`} />
             <div className={`flex-1 h-[3px] rounded-full transition-all duration-300 ${role ? "bg-amber-500 opacity-70" : "bg-[#272731]"}`} />
-            <div className={`flex-1 h-[3px] rounded-full transition-all duration-300 ${experience !== "mid" ? "bg-amber-500 opacity-40" : "bg-[#272731]"}`} />
+            <div className={`flex-1 h-[3px] rounded-full transition-all duration-300 ${name && role ? "bg-amber-500" : "bg-[#272731]"}`} />
           </div>
 
           {/* Name */}

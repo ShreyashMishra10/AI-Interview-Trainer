@@ -300,7 +300,7 @@ export default async function Home() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {FEATURES.map((f, i) => (
               <Reveal key={f.title} delay={i * 70}>
-                <div className="bg-white dark:bg-card border border-zinc-200 dark:border-border rounded-2xl p-6 shadow-sm dark:shadow-none hover:border-amber-500/20 hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] transition-all duration-300 h-full">
+                <div className="bg-white dark:bg-card border border-zinc-200 dark:border-border rounded-2xl p-6 shadow-sm dark:shadow-none hover:border-amber-500/20 hover:shadow-[0_8px_30px_rgba(0,0,0,0.10)] hover:-translate-y-2 transition-all duration-300 h-full">
                   <div className={`w-10 h-10 rounded-xl border flex items-center justify-center mb-4 ${f.bg} ${f.color}`}>
                     {f.icon}
                   </div>

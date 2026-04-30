@@ -111,10 +111,8 @@ function Waveform({ active }: { active: boolean }) {
 // ── AI Orb — glows ONLY when speaking ────────────────────────────────────────
 function AIOrb({
   speaking,
-  listening,
 }: {
   speaking: boolean;
-  listening: boolean;
 }) {
   return (
     <div className="relative flex items-center justify-center w-full h-full">
@@ -226,6 +224,7 @@ export default function InterviewSessionPage() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
 
   const sendMessage = useCallback(
     async (content: string) => {
@@ -583,7 +582,7 @@ export default function InterviewSessionPage() {
             className="w-full flex-1 flex items-center justify-center relative"
             style={{ minHeight: "200px" }}
           >
-            <AIOrb speaking={isSpeaking} listening={isListening} />
+            <AIOrb speaking={isSpeaking} />
           </div>
 
           {/* Waveform */}
@@ -595,9 +594,9 @@ export default function InterviewSessionPage() {
           <div className="w-full flex flex-col items-center gap-3">
             {mode === "voice" ? (
               <>
-                <p className="text-[11px] text-[#7A7A9A] text-center min-h-[32px]">
+                <p className="text-[11px] text-[#7A7A9A] text-center">
                   {isListening
-                    ? transcript || "Listening... speak now"
+                    ? "Listening... speak now"
                     : isSpeaking
                       ? "AI is responding..."
                       : isLoading
@@ -663,6 +662,18 @@ export default function InterviewSessionPage() {
                 </div>
               </div>
             )}
+            {/* Live voice transcript bubble */}
+            {isListening && transcript && (
+              <div className="flex gap-2.5 flex-row-reverse">
+                <div className="shrink-0 w-7 h-7 rounded-full bg-[#6C63FF] flex items-center justify-center mt-0.5">
+                  <Mic size={12} className="text-white" />
+                </div>
+                <div className="max-w-[75%] rounded-2xl rounded-tr-sm px-4 py-3 bg-[#6C63FF]/20 border border-[#6C63FF]/30 text-zinc-300 text-sm leading-relaxed">
+                  {transcript}
+                  <span className="inline-block w-1 h-3.5 bg-[#6C63FF] ml-1 animate-pulse rounded-sm" />
+                </div>
+              </div>
+            )}
             <div ref={messagesEndRef} />
           </div>
 
@@ -690,15 +701,6 @@ export default function InterviewSessionPage() {
                 }}
                 className="flex-1 bg-[#1c1c26] border border-[#2d2d3d] rounded-xl px-4 py-2.5 text-[13px] text-white placeholder:text-[#4A4A6A] outline-none focus:border-[#6C63FF] transition resize-none disabled:opacity-50 min-h-[42px] max-h-[120px]"
               />
-              {supported && mode === "voice" && (
-                <button
-                  onClick={handleVoiceToggle}
-                  disabled={isLoading || isSpeaking || isComplete}
-                  className={`shrink-0 w-10 h-10 rounded-xl flex items-center justify-center border transition ${isListening ? "bg-red-500 border-red-500 text-white" : "border-[#2d2d3d] text-[#7A7A9A] hover:border-[#6C63FF]/50 hover:text-[#6C63FF]"} disabled:opacity-40`}
-                >
-                  {isListening ? <MicOff size={15} /> : <Mic size={15} />}
-                </button>
-              )}
               <button
                 onClick={handleSend}
                 disabled={!input.trim() || isLoading || isComplete}
