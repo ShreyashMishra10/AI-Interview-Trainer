@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/nextjs";
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { rateLimit } from "@/lib/ratelimit";
@@ -52,7 +53,7 @@ export async function POST(req: NextRequest) {
     const trimmed = text.replace(/\s+/g, " ").trim().slice(0, 3000);
     return NextResponse.json({ text: trimmed });
   } catch (err) {
-    console.error("CV parse error:", err);
+    Sentry.captureException(err);
     return NextResponse.json({ error: "Failed to parse CV" }, { status: 500 });
   }
 }

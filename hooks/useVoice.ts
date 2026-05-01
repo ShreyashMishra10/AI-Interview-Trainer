@@ -40,7 +40,8 @@ export function useVoice({ onTranscript }: UseVoiceOptions) {
       setTranscript("");
     };
 
-    r.onresult = (event: SpeechRecognitionEvent) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    r.onresult = (event: any) => {
       let interim = "";
       let final   = "";
       for (let i = event.resultIndex; i < event.results.length; i++) {

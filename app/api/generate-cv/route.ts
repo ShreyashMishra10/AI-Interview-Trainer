@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/nextjs";
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
@@ -132,8 +133,7 @@ REQUIREMENTS:
     });
 
   } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : "Internal Server Error";
-    console.error("CV Generation Error:", msg);
+    Sentry.captureException(err);
     return NextResponse.json({ error: "Something went wrong. Please try again." }, { status: 500 });
   }
 }

@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/nextjs";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
@@ -214,8 +215,7 @@ INTERVIEW RULES:
 
     return NextResponse.json({ reply: text, isComplete, score });
   } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : "Internal Server Error";
-    console.error("Interview API Error:", msg);
-    return NextResponse.json({ error: msg }, { status: 500 });
+    Sentry.captureException(err);
+    return NextResponse.json({ error: "Something went wrong. Please try again." }, { status: 500 });
   }
 }
