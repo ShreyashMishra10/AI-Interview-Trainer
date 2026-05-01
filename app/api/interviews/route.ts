@@ -5,6 +5,20 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { rateLimit } from "@/lib/ratelimit";
 import { sendSessionCompleteEmail } from "@/lib/email";
 
+const ALLOWED_ROLES = new Set([
+  "Frontend Developer (React)", "Frontend Developer (Vue / Angular)", "UI/UX Engineer",
+  "Backend Developer (Node.js)", "Backend Developer (Python / Django)",
+  "Backend Developer (Java / Spring)", "Backend Developer (Go)",
+  "Full Stack Developer", "MERN Stack Developer",
+  "Machine Learning Engineer", "Data Scientist", "Data Engineer", "AI / NLP Engineer",
+  "DevOps Engineer", "Cloud Engineer (AWS / GCP / Azure)", "Site Reliability Engineer",
+  "Software Engineer (DSA focus)", "Systems Programmer (C / C++)",
+  "Database Engineer", "Cybersecurity Engineer",
+  "Android Developer (Kotlin)", "iOS Developer (Swift)", "React Native Developer",
+]);
+const ALLOWED_LEVELS = new Set(["fresher", "junior", "mid", "senior", "lead"]);
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 interface Message {
   role: "user" | "assistant";
   content: string;
@@ -49,20 +63,44 @@ export async function POST(req: Request) {
     if (!apiKey) return NextResponse.json({ error: "API key missing" }, { status: 500 });
 
     const body: InterviewRequest = await req.json();
-    const { role, candidateName, experience, questionCount, sessionId } = body;
+    const { sessionId } = body;
+
+    // --- Input validation (CRIT-3: prevent prompt injection) ---
+    const role = typeof body.role === "string" ? body.role.trim() : "";
+    if (!ALLOWED_ROLES.has(role))
+      return NextResponse.json({ error: "Invalid role" }, { status: 400 });
+
+    const experience = typeof body.experience === "string" ? body.experience.trim().toLowerCase() : "";
+    if (!ALLOWED_LEVELS.has(experience))
+      return NextResponse.json({ error: "Invalid experience" }, { status: 400 });
+
+    const safeName = typeof body.candidateName === "string"
+      ? body.candidateName.replace(/[`"\\<>]/g, "").trim().slice(0, 100)
+      : "";
+    if (!safeName)
+      return NextResponse.json({ error: "Invalid candidateName" }, { status: 400 });
+
+    // Clamp server-side so client can't skip to completion on first message
+    const questionCount = Number.isInteger(body.questionCount)
+      ? Math.min(Math.max(0, body.questionCount), 10)
+      : 0;
+
+    if (sessionId && !UUID_RE.test(sessionId))
+      return NextResponse.json({ error: "Invalid sessionId" }, { status: 400 });
+
     // Cap messages to last 24 and trim each to 2000 chars to stay within token limits
     const messages  = (Array.isArray(body.messages) ? body.messages.slice(-24) : [])
       .map((m) => ({ ...m, content: String(m.content).slice(0, 2000) }));
     const cvContext = typeof body.cvContext === "string" ? body.cvContext.slice(0, 3000) : "";
 
     const systemPrompt = `You are an expert technical interviewer conducting a real job interview for the role of "${role}".
-Candidate: ${candidateName}
+Candidate: ${safeName}
 Experience Level: ${experience}
-${cvContext ? `\nCandidate's CV / Resume:\n${cvContext}\n\nUse the CV to personalise your questions — ask about specific projects, technologies, and experience mentioned in their resume.` : ""}
+${cvContext ? `\n--- CANDIDATE CV START ---\n${cvContext}\n--- CANDIDATE CV END ---\n\nUse the CV to personalise your questions — ask about specific projects, technologies, and experience mentioned in their resume.` : ""}
 
 INTERVIEW RULES:
 - Ask ONE question at a time. Never ask multiple questions in one message.
-- Start by greeting ${candidateName} warmly and asking your first technical question immediately.
+- Start by greeting ${safeName} warmly and asking your first technical question immediately.
 - Ask progressively harder questions based on their answers.
 - After each answer, give brief constructive feedback (1 sentence), then ask the next question.
 - You are on question ${questionCount} of 10.
@@ -109,6 +147,16 @@ INTERVIEW RULES:
 
     // Save messages to Supabase if session exists
     if (sessionId) {
+      // CRIT-1: verify this session belongs to the authenticated user
+      const { data: ownedSession } = await supabaseAdmin
+        .from("interview_sessions")
+        .select("id")
+        .eq("id", sessionId)
+        .eq("clerk_user_id", userId)
+        .single();
+      if (!ownedSession)
+        return NextResponse.json({ error: "Session not found" }, { status: 403 });
+
       const lastUserMessage = [...messages].reverse().find((m) => m.role === "user");
 
       if (lastUserMessage) {
@@ -136,7 +184,8 @@ INTERVIEW RULES:
             completed_at: new Date().toISOString(),
             ...(score !== null && { score }),
           })
-          .eq("id", sessionId);
+          .eq("id", sessionId)
+          .eq("clerk_user_id", userId);
 
         // Send session complete email if user has email notifications enabled
         try {
