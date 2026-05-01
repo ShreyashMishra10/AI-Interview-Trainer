@@ -13,8 +13,8 @@ export async function GET() {
     { data: messages },
     { data: cvs },
   ] = await Promise.all([
-    supabaseAdmin.from("profiles").select("*").eq("clerk_user_id", userId).single(),
-    supabaseAdmin.from("interview_sessions").select("*").eq("clerk_user_id", userId).order("created_at", { ascending: false }),
+    supabaseAdmin.from("profiles").select("full_name, email, plan, notification_prefs, privacy_prefs, created_at").eq("clerk_user_id", userId).single(),
+    supabaseAdmin.from("interview_sessions").select("id, job_role, experience_level, mode, status, score, created_at, completed_at").eq("clerk_user_id", userId).order("created_at", { ascending: false }),
     supabaseAdmin.from("session_messages").select("session_id, role, content, question_number, created_at")
       .in("session_id", (await supabaseAdmin.from("interview_sessions").select("id").eq("clerk_user_id", userId)).data?.map((s) => s.id) ?? []),
     supabaseAdmin.from("cv_generations").select("*").eq("clerk_user_id", userId).order("created_at", { ascending: false }),

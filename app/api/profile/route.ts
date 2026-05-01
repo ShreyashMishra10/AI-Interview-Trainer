@@ -32,6 +32,24 @@ export async function GET() {
   });
 }
 
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const VALID_NOTIF_KEYS = new Set([
+  "interviewReminders", "weeklyReport", "sessionComplete", "tips", "marketing", "email", "sound",
+]);
+const VALID_PRIVACY_KEYS = new Set([
+  "shareData", "analytics", "publicProfile",
+]);
+
+function sanitizePrefs(raw: unknown, validKeys: Set<string>): Record<string, boolean> | null {
+  if (typeof raw !== "object" || raw === null || Array.isArray(raw)) return null;
+  const result: Record<string, boolean> = {};
+  for (const [k, v] of Object.entries(raw as Record<string, unknown>)) {
+    if (validKeys.has(k) && typeof v === "boolean") result[k] = v;
+  }
+  return result;
+}
+
 // PATCH /api/profile — update display name or email
 export async function PATCH(req: NextRequest) {
   const { userId } = await auth();
@@ -40,10 +58,28 @@ export async function PATCH(req: NextRequest) {
   const body = await req.json();
 
   const allowedFields: Record<string, unknown> = {};
-  if (typeof body.full_name          === "string") allowedFields.full_name          = body.full_name.trim().slice(0, 200);
-  if (typeof body.email              === "string") allowedFields.email              = body.email.trim().slice(0, 200);
-  if (body.notification_prefs !== undefined)       allowedFields.notification_prefs = body.notification_prefs;
-  if (body.privacy_prefs      !== undefined)       allowedFields.privacy_prefs      = body.privacy_prefs;
+
+  if (typeof body.full_name === "string")
+    allowedFields.full_name = body.full_name.trim().slice(0, 200);
+
+  if (typeof body.email === "string") {
+    const email = body.email.trim().slice(0, 200);
+    if (!EMAIL_RE.test(email))
+      return NextResponse.json({ error: "Invalid email address" }, { status: 400 });
+    allowedFields.email = email;
+  }
+
+  if (body.notification_prefs !== undefined) {
+    const sanitized = sanitizePrefs(body.notification_prefs, VALID_NOTIF_KEYS);
+    if (!sanitized) return NextResponse.json({ error: "Invalid notification_prefs" }, { status: 400 });
+    allowedFields.notification_prefs = sanitized;
+  }
+
+  if (body.privacy_prefs !== undefined) {
+    const sanitized = sanitizePrefs(body.privacy_prefs, VALID_PRIVACY_KEYS);
+    if (!sanitized) return NextResponse.json({ error: "Invalid privacy_prefs" }, { status: 400 });
+    allowedFields.privacy_prefs = sanitized;
+  }
 
   if (Object.keys(allowedFields).length === 0)
     return NextResponse.json({ error: "No valid fields to update" }, { status: 400 });

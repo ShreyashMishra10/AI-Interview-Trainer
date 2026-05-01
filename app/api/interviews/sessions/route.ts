@@ -5,6 +5,17 @@ import { getOrCreateProfile } from "@/lib/supabase/profile";
 
 const ALLOWED_MODES = ["chat", "voice"] as const;
 const ALLOWED_LEVELS = ["fresher", "junior", "mid", "senior", "lead"] as const;
+const ALLOWED_ROLES = new Set([
+  "Frontend Developer (React)", "Frontend Developer (Vue / Angular)", "UI/UX Engineer",
+  "Backend Developer (Node.js)", "Backend Developer (Python / Django)",
+  "Backend Developer (Java / Spring)", "Backend Developer (Go)",
+  "Full Stack Developer", "MERN Stack Developer",
+  "Machine Learning Engineer", "Data Scientist", "Data Engineer", "AI / NLP Engineer",
+  "DevOps Engineer", "Cloud Engineer (AWS / GCP / Azure)", "Site Reliability Engineer",
+  "Software Engineer (DSA focus)", "Systems Programmer (C / C++)",
+  "Database Engineer", "Cybersecurity Engineer",
+  "Android Developer (Kotlin)", "iOS Developer (Swift)", "React Native Developer",
+]);
 
 // POST /api/interviews/sessions — create a new interview session
 export async function POST(req: NextRequest) {
@@ -18,6 +29,8 @@ export async function POST(req: NextRequest) {
 
   if (!job_role)
     return NextResponse.json({ error: "job_role is required" }, { status: 400 });
+  if (!ALLOWED_ROLES.has(job_role))
+    return NextResponse.json({ error: "Invalid job_role" }, { status: 400 });
   if (!ALLOWED_LEVELS.includes(experience_level as typeof ALLOWED_LEVELS[number]))
     return NextResponse.json({ error: "Invalid experience_level" }, { status: 400 });
   if (!ALLOWED_MODES.includes(mode as typeof ALLOWED_MODES[number]))
