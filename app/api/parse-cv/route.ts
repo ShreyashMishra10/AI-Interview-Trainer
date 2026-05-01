@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { success } = rateLimit(`parse-cv:${userId}`, 10, 60_000);
+  const { success } = await rateLimit(`parse-cv:${userId}`, 10, 60_000);
   if (!success)
     return NextResponse.json({ error: "Too many requests. Please wait a minute." }, { status: 429 });
 
@@ -27,6 +27,13 @@ export async function POST(req: NextRequest) {
 
   // Read buffer only after size and type are validated
   const buffer = Buffer.from(await file.arrayBuffer());
+
+  // Verify magic bytes — reject files that lie about their extension
+  // PDF: %PDF (25 50 44 46) | DOCX/ZIP: PK (50 4B)
+  const isPDF  = buffer[0] === 0x25 && buffer[1] === 0x50 && buffer[2] === 0x44 && buffer[3] === 0x46;
+  const isDOCX = buffer[0] === 0x50 && buffer[1] === 0x4B;
+  if (ext === "pdf"  && !isPDF)  return NextResponse.json({ error: "Invalid PDF file" },  { status: 400 });
+  if (ext === "docx" && !isDOCX) return NextResponse.json({ error: "Invalid DOCX file" }, { status: 400 });
 
   try {
     let text = "";

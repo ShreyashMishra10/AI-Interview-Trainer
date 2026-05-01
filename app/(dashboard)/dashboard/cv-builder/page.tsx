@@ -220,12 +220,19 @@ export default function AICVBuilder() {
   };
 
   const handlePrint = () => {
-    const printContent = document.getElementById("cv-print")?.innerHTML;
-    if (!printContent) return;
-    const win = window.open("", "_blank");
-    if (!win) return;
-    win.document.write(`
-      <html><head><title>CV — ${aiResult?.name ?? ""}</title>
+    const printEl = document.getElementById("cv-print");
+    if (!printEl) return;
+
+    // Strip script tags and all inline event handlers before writing to popup
+    const clone = printEl.cloneNode(true) as HTMLElement;
+    clone.querySelectorAll("script").forEach((el) => el.remove());
+    clone.querySelectorAll("*").forEach((el) => {
+      Array.from(el.attributes)
+        .filter((a) => a.name.startsWith("on"))
+        .forEach((a) => el.removeAttribute(a.name));
+    });
+
+    const html = `<!DOCTYPE html><html><head><title>CV — ${aiResult?.name ?? ""}</title>
       <style>
         body { font-family: Georgia, serif; padding: 40px; color: #18181b; font-size: 13px; }
         h1 { font-size: 26px; margin: 0; }
@@ -234,10 +241,12 @@ export default function AICVBuilder() {
         li { margin-bottom: 3px; }
         .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
       </style></head>
-      <body>${printContent}</body></html>
-    `);
-    win.document.close();
-    win.print();
+      <body onload="window.print()">${clone.innerHTML}</body></html>`;
+
+    const blob = new Blob([html], { type: "text/html" });
+    const url  = URL.createObjectURL(blob);
+    window.open(url, "_blank", "noopener,noreferrer");
+    setTimeout(() => URL.revokeObjectURL(url), 30_000);
   };
 
   const STEPS = [

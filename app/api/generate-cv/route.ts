@@ -36,7 +36,7 @@ export async function POST(req: Request) {
     const { userId } = await auth();
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const { success } = rateLimit(`generate-cv:${userId}`, 5, 60_000);
+    const { success } = await rateLimit(`generate-cv:${userId}`, 5, 60_000);
     if (!success)
       return NextResponse.json({ error: "Too many requests. Please wait a minute." }, { status: 429 });
 

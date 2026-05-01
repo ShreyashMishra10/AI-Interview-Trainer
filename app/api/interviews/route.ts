@@ -55,7 +55,7 @@ export async function POST(req: Request) {
     const { userId } = await auth();
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const { success } = rateLimit(`interviews:${userId}`, 30, 60_000);
+    const { success } = await rateLimit(`interviews:${userId}`, 30, 60_000);
     if (!success)
       return NextResponse.json({ error: "Too many requests. Please slow down." }, { status: 429 });
 
