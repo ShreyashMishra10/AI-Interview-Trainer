@@ -56,49 +56,43 @@ function TextAreaGroup({ label, placeholder, value, onChange }: { label: string;
   );
 }
 
-/* ── CV Preview (used for both display + print) ─────────────── */
+/* ── CV Preview (Google XYZ format — ATS friendly) ─────────── */
 function CVPreview({ cv }: { cv: CVData }) {
   return (
-    <div id="cv-print" className="bg-white text-zinc-900 rounded-2xl p-10 max-w-3xl mx-auto shadow-xl text-sm leading-relaxed">
+    <div id="cv-print" className="bg-white text-zinc-900 rounded-2xl p-10 max-w-3xl mx-auto shadow-xl font-sans">
+
       {/* Header */}
-      <div className="border-b-2 border-amber-500 pb-5 mb-6">
-        <h1 className="text-3xl font-bold text-zinc-900">{cv.name}</h1>
-        <p className="text-zinc-500 mt-0.5">{cv.email}</p>
-        {cv.target_role && (
-          <span className="inline-block mt-2 px-3 py-1 bg-amber-50 border border-amber-200 rounded-full text-xs font-semibold text-amber-700">
-            {cv.target_role}
-          </span>
-        )}
+      <div className="text-center mb-4">
+        <h1 className="text-[26px] font-bold tracking-tight text-zinc-900">{cv.name}</h1>
+        <p className="text-sm text-zinc-600 mt-1">{cv.email}</p>
       </div>
+
+      <hr className="border-zinc-900 mb-4" />
 
       {/* Summary */}
       {cv.summary && (
-        <section className="mb-6">
-          <h2 className="text-[11px] font-bold uppercase tracking-widest text-amber-600 mb-2">Professional Summary</h2>
-          <p className="text-zinc-700">{cv.summary}</p>
+        <section className="mb-4">
+          <h2 className="text-[11px] font-bold uppercase tracking-widest text-zinc-900 border-b border-zinc-300 pb-0.5 mb-2">Summary</h2>
+          <p className="text-[13px] text-zinc-700 leading-relaxed">{cv.summary}</p>
         </section>
       )}
 
       {/* Experience */}
       {cv.experience?.length > 0 && (
-        <section className="mb-6">
-          <h2 className="text-[11px] font-bold uppercase tracking-widest text-amber-600 mb-3">Experience</h2>
-          <div className="space-y-4">
+        <section className="mb-4">
+          <h2 className="text-[11px] font-bold uppercase tracking-widest text-zinc-900 border-b border-zinc-300 pb-0.5 mb-3">Experience</h2>
+          <div className="space-y-3">
             {cv.experience.map((e, i) => (
               <div key={i}>
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="font-bold text-zinc-900">{e.title}</p>
-                    <p className="text-zinc-500 text-xs">{e.company}</p>
-                  </div>
-                  <span className="text-xs text-zinc-400 shrink-0 ml-4">{e.duration}</span>
+                <div className="flex justify-between items-baseline">
+                  <p className="text-[13px] font-bold text-zinc-900">{e.company}</p>
+                  <span className="text-[12px] text-zinc-500 shrink-0 ml-4">{e.duration}</span>
                 </div>
+                <p className="text-[12px] italic text-zinc-600 mb-1">{e.title}</p>
                 {e.bullets?.length > 0 && (
-                  <ul className="mt-2 space-y-1">
+                  <ul className="space-y-0.5 pl-4">
                     {e.bullets.map((b, j) => (
-                      <li key={j} className="flex gap-2 text-zinc-700">
-                        <span className="text-amber-500 shrink-0">•</span>{b}
-                      </li>
+                      <li key={j} className="text-[12px] text-zinc-700 list-disc">{b}</li>
                     ))}
                   </ul>
                 )}
@@ -110,17 +104,19 @@ function CVPreview({ cv }: { cv: CVData }) {
 
       {/* Projects */}
       {cv.projects?.length > 0 && (
-        <section className="mb-6">
-          <h2 className="text-[11px] font-bold uppercase tracking-widest text-amber-600 mb-3">Projects</h2>
+        <section className="mb-4">
+          <h2 className="text-[11px] font-bold uppercase tracking-widest text-zinc-900 border-b border-zinc-300 pb-0.5 mb-3">Projects</h2>
           <div className="space-y-3">
             {cv.projects.map((p, i) => (
               <div key={i}>
-                <div className="flex justify-between items-start">
-                  <p className="font-bold text-zinc-900">{p.name}</p>
-                  <span className="text-xs text-zinc-400 ml-4 shrink-0">{p.tech_stack}</span>
+                <div className="flex justify-between items-baseline">
+                  <p className="text-[13px] font-bold text-zinc-900">{p.name}</p>
+                  <span className="text-[11px] text-zinc-500 ml-4 shrink-0">{p.tech_stack}</span>
                 </div>
-                <p className="text-zinc-700 text-xs mt-0.5">{p.description}</p>
-                {p.impact && <p className="text-amber-700 text-xs mt-0.5 font-medium">Impact: {p.impact}</p>}
+                <ul className="pl-4 space-y-0.5">
+                  <li className="text-[12px] text-zinc-700 list-disc">{p.description}</li>
+                  {p.impact && <li className="text-[12px] text-zinc-700 list-disc">{p.impact}</li>}
+                </ul>
               </div>
             ))}
           </div>
@@ -130,25 +126,22 @@ function CVPreview({ cv }: { cv: CVData }) {
       {/* Skills */}
       {cv.skills && (
         <section>
-          <h2 className="text-[11px] font-bold uppercase tracking-widest text-amber-600 mb-3">Skills</h2>
-          <div className="grid grid-cols-3 gap-4">
+          <h2 className="text-[11px] font-bold uppercase tracking-widest text-zinc-900 border-b border-zinc-300 pb-0.5 mb-2">Skills</h2>
+          <div className="space-y-1">
             {cv.skills.technical?.length > 0 && (
-              <div>
-                <p className="text-xs font-bold text-zinc-500 mb-1">Technical</p>
-                <p className="text-zinc-700 text-xs">{cv.skills.technical.join(", ")}</p>
-              </div>
+              <p className="text-[12px] text-zinc-700">
+                <span className="font-bold">Technical: </span>{cv.skills.technical.join(", ")}
+              </p>
             )}
             {cv.skills.soft?.length > 0 && (
-              <div>
-                <p className="text-xs font-bold text-zinc-500 mb-1">Soft Skills</p>
-                <p className="text-zinc-700 text-xs">{cv.skills.soft.join(", ")}</p>
-              </div>
+              <p className="text-[12px] text-zinc-700">
+                <span className="font-bold">Soft Skills: </span>{cv.skills.soft.join(", ")}
+              </p>
             )}
             {cv.skills.languages?.length > 0 && (
-              <div>
-                <p className="text-xs font-bold text-zinc-500 mb-1">Languages</p>
-                <p className="text-zinc-700 text-xs">{cv.skills.languages.join(", ")}</p>
-              </div>
+              <p className="text-[12px] text-zinc-700">
+                <span className="font-bold">Languages: </span>{cv.skills.languages.join(", ")}
+              </p>
             )}
           </div>
         </section>
@@ -232,14 +225,27 @@ export default function AICVBuilder() {
         .forEach((a) => el.removeAttribute(a.name));
     });
 
-    const html = `<!DOCTYPE html><html><head><title>CV — ${aiResult?.name ?? ""}</title>
+    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>CV — ${aiResult?.name ?? ""}</title>
       <style>
-        body { font-family: Georgia, serif; padding: 40px; color: #18181b; font-size: 13px; }
-        h1 { font-size: 26px; margin: 0; }
-        h2 { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: #d97706; border-bottom: 1px solid #fde68a; padding-bottom: 4px; margin-top: 20px; }
-        ul { padding-left: 16px; }
-        li { margin-bottom: 3px; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; padding: 48px 56px; color: #18181b; font-size: 12px; line-height: 1.5; }
+        #cv-print { max-width: 100%; box-shadow: none; border-radius: 0; padding: 0; }
+        h1 { font-size: 22px; font-weight: 700; text-align: center; }
+        .text-center { text-align: center; }
+        .text-sm { font-size: 12px; }
+        .text-zinc-600 { color: #52525b; }
+        hr { border: none; border-top: 1.5px solid #18181b; margin: 12px 0; }
+        h2 { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; border-bottom: 1px solid #d4d4d8; padding-bottom: 2px; margin-bottom: 8px; margin-top: 14px; }
+        .flex { display: flex; justify-content: space-between; align-items: baseline; }
+        .font-bold { font-weight: 700; }
+        .italic { font-style: italic; }
+        ul { padding-left: 16px; margin-top: 2px; }
+        li { margin-bottom: 2px; font-size: 12px; color: #3f3f46; }
+        .space-y-3 > * + * { margin-top: 10px; }
+        .space-y-1 > * + * { margin-top: 3px; }
+        .mb-4 { margin-bottom: 14px; }
+        .mb-2 { margin-bottom: 6px; }
+        .mb-1 { margin-bottom: 3px; }
       </style></head>
       <body onload="window.print()">${clone.innerHTML}</body></html>`;
 

@@ -60,8 +60,11 @@ export function useVoice({ onTranscript }: UseVoiceOptions) {
       }
     };
 
-    r.onerror = (e: SpeechRecognitionErrorEvent) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    r.onerror = (e: any) => {
       if (e.error === "aborted" || e.error === "no-speech") return;
+      console.error("[useVoice] SpeechRecognition error:", e.error);
+      shouldListenRef.current = false;
       setIsListening(false);
       setTranscript("");
     };
@@ -82,11 +85,18 @@ export function useVoice({ onTranscript }: UseVoiceOptions) {
   }, []);
 
   const startListening = useCallback(() => {
+    console.log("[useVoice] startListening called, supported:", supported);
     if (!supported) return;
     shouldListenRef.current = true;
     const r = createRecognition();
     recognitionRef.current = r;
-    r.start();
+    try {
+      r.start();
+    } catch (err) {
+      console.error("[useVoice] r.start() threw:", err);
+      shouldListenRef.current = false;
+      setIsListening(false);
+    }
   }, [supported, createRecognition]);
 
   const stopListening = useCallback(() => {

@@ -2,7 +2,7 @@ import * as Sentry from "@sentry/nextjs";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import Groq from "groq-sdk";
 import { rateLimit } from "@/lib/ratelimit";
 import { sendSessionCompleteEmail } from "@/lib/email";
 
@@ -60,7 +60,7 @@ export async function POST(req: Request) {
     if (!success)
       return NextResponse.json({ error: "Too many requests. Please slow down." }, { status: 429 });
 
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.GROQ_API_KEY;
     if (!apiKey) return NextResponse.json({ error: "API key missing" }, { status: 500 });
 
     const body: InterviewRequest = await req.json();
@@ -94,44 +94,46 @@ export async function POST(req: Request) {
       .map((m) => ({ ...m, content: String(m.content).slice(0, 2000) }));
     const cvContext = typeof body.cvContext === "string" ? body.cvContext.slice(0, 3000) : "";
 
-    const systemPrompt = `You are an expert technical interviewer conducting a real job interview for the role of "${role}".
-Candidate: ${safeName}
-Experience Level: ${experience}
-${cvContext ? `\n--- CANDIDATE CV START ---\n${cvContext}\n--- CANDIDATE CV END ---\n\nUse the CV to personalise your questions — ask about specific projects, technologies, and experience mentioned in their resume.` : ""}
+    const systemPrompt = `You are a senior technical interviewer at a top tech company conducting a real job interview for the role of "${role}".
+Candidate name: ${safeName}
+Experience level: ${experience}
+${cvContext ? `\n--- CANDIDATE CV START ---\n${cvContext}\n--- CANDIDATE CV END ---\n` : ""}
 
-INTERVIEW RULES:
-- Ask ONE question at a time. Never ask multiple questions in one message.
-- Start by greeting ${safeName} warmly and asking your first technical question immediately.
-- Ask progressively harder questions based on their answers.
-- After each answer, give brief constructive feedback (1 sentence), then ask the next question.
-- You are on question ${questionCount} of 10.
-- After question 10, wrap up: give overall assessment with 2-3 strengths and 1-2 areas to improve, then say goodbye.
-- At the very end of your final message, on a new line, write exactly: SCORE: XX/100 (where XX is an integer 0–100 reflecting the candidate's overall technical performance).
-- Keep responses concise and conversational.
-- Be encouraging but honest.
-- No markdown, no bullet points. Plain conversational text only.`;
+INTERVIEW STRUCTURE (follow this strictly):
+1. INTRODUCTION (question 0): Warmly introduce yourself as "Sarah", welcome ${safeName}, briefly mention the format (10 questions, feedback after each), then ask them to introduce themselves and walk you through their background. Do NOT ask a technical question yet.
+2. TECHNICAL QUESTIONS (questions 1–9): After their introduction, ask one technical question per turn. Give 1-sentence feedback on their answer, then ask the next question. Progress from fundamentals to advanced topics.${cvContext ? " Personalise questions based on their CV — reference specific projects and technologies they mentioned." : ""}
+3. WRAP UP (question 10): Give an overall assessment with 2–3 strengths and 1–2 improvement areas, thank them warmly, then end with exactly: SCORE: XX/100
 
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({
-      model:             "gemini-2.0-flash",
-      systemInstruction: systemPrompt,
-    });
+RULES:
+- One message at a time. Never ask multiple questions.
+- You are currently on turn ${questionCount} of 10.
+- Be professional, encouraging, and conversational. No markdown, no bullet points.
+- If the candidate says something off-topic like "ask another question", gently redirect: remind them this is an interview and ask them to answer the current question.
+- SCORE line only appears in your final wrap-up message.`;
 
-    // Gemini uses "model" instead of "assistant"
-    const history = messages.slice(0, -1).map((m) => ({
-      role:  m.role === "assistant" ? "model" : "user",
-      parts: [{ text: m.content }],
-    }));
+    const groq = new Groq({ apiKey });
 
-    const lastMessage = messages[messages.length - 1]?.content ?? "";
-
-    const chat = model.startChat({ history });
+    const groqMessages = [
+      { role: "system" as const, content: systemPrompt },
+      ...messages.map((m) => ({
+        role:    m.role === "assistant" ? "assistant" as const : "user" as const,
+        content: m.content,
+      })),
+    ];
 
     const timeout = new Promise<never>((_, reject) =>
       setTimeout(() => reject(new Error("AI response timed out. Please try again.")), 30_000)
     );
-    const result  = await Promise.race([chat.sendMessage(lastMessage), timeout]);
-    const rawText = result.response.text();
+    const result  = await Promise.race([
+      groq.chat.completions.create({
+        model:       "llama-3.3-70b-versatile",
+        messages:    groqMessages,
+        temperature: 0.7,
+        max_tokens:  1024,
+      }),
+      timeout,
+    ]);
+    const rawText = result.choices[0]?.message?.content ?? "";
 
     // Extract score from final message (e.g. "SCORE: 78/100")
     const scoreMatch = rawText.match(/SCORE:\s*(\d{1,3})\/100/i);
@@ -215,6 +217,7 @@ INTERVIEW RULES:
 
     return NextResponse.json({ reply: text, isComplete, score });
   } catch (err: unknown) {
+    console.error("[interviews] ERROR:", err);
     Sentry.captureException(err);
     return NextResponse.json({ error: "Something went wrong. Please try again." }, { status: 500 });
   }

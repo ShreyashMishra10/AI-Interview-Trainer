@@ -1,7 +1,7 @@
 import * as Sentry from "@sentry/nextjs";
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import Groq from "groq-sdk";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { getOrCreateProfile } from "@/lib/supabase/profile";
 import { rateLimit } from "@/lib/ratelimit";
@@ -41,7 +41,7 @@ export async function POST(req: Request) {
     if (!success)
       return NextResponse.json({ error: "Too many requests. Please wait a minute." }, { status: 429 });
 
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.GROQ_API_KEY;
     if (!apiKey) return NextResponse.json({ error: "API key missing" }, { status: 500 });
 
     const body = await req.json();
@@ -75,9 +75,7 @@ export async function POST(req: Request) {
         );
     }
 
-    // Generate CV with Gemini
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const groq = new Groq({ apiKey });
 
     const prompt = `You are a Career Architect and expert CV writer. Rewrite the following information into a polished, professional CV using impact-driven language that gets noticed by recruiters.
 
@@ -102,8 +100,16 @@ REQUIREMENTS:
     const timeout = new Promise<never>((_, reject) =>
       setTimeout(() => reject(new Error("AI response timed out. Please try again.")), 30_000)
     );
-    const result  = await Promise.race([model.generateContent(prompt), timeout]);
-    const aiText  = result.response.text().replace(/```json|```/g, "").trim();
+    const result  = await Promise.race([
+      groq.chat.completions.create({
+        model:       "llama-3.3-70b-versatile",
+        messages:    [{ role: "user", content: prompt }],
+        temperature: 0.7,
+        max_tokens:  2048,
+      }),
+      timeout,
+    ]);
+    const aiText  = (result.choices[0]?.message?.content ?? "").replace(/```json|```/g, "").trim();
 
     // Parse and validate JSON
     let cvData: Record<string, unknown>;

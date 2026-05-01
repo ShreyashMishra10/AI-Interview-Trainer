@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback, memo } from "react";
+import { useState, useEffect, useRef, useCallback, memo, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useVoice } from "@/hooks/useVoice";
 import {
@@ -47,7 +47,7 @@ function WebcamFeed() {
           setHasCamera(true);
         }
       })
-      .catch(() => setHasCamera(false));
+      .catch((err) => { console.error("[WebcamFeed] getUserMedia failed:", err.name, err.message); setHasCamera(false); });
 
     return () => {
       cancelled = true;
@@ -188,7 +188,7 @@ const MessageBubble = memo(function MessageBubble({ message }: { message: Messag
 });
 
 // ── Main Page ─────────────────────────────────────────────────────────────────
-export default function InterviewSessionPage() {
+function InterviewSessionContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -265,6 +265,7 @@ export default function InterviewSessionPage() {
           setMessages((prev) => [...prev, aiMsg]);
           setQuestionCount((p) => p + 1);
           if (data.isComplete) {
+            stopListening();
             setIsComplete(true);
             if (data.score !== null && data.score !== undefined) setFinalScore(data.score);
           }
@@ -541,6 +542,8 @@ export default function InterviewSessionPage() {
               <button
                 onClick={async () => {
                   setConfirmEnd(false);
+                  stopSpeaking();
+                  stopListening();
                   if (sessionId) {
                     await fetch(`/api/interviews/sessions/${sessionId}`, { method: "PATCH" });
                   }
@@ -720,5 +723,13 @@ export default function InterviewSessionPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function InterviewSessionPage() {
+  return (
+    <Suspense>
+      <InterviewSessionContent />
+    </Suspense>
   );
 }
