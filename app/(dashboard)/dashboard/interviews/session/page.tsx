@@ -294,6 +294,13 @@ function InterviewSessionContent() {
   const startInterview = useCallback(async () => {
     setStarted(true);
     setIsLoading(true);
+    if (sessionId) {
+      fetch(`/api/interviews/sessions/${sessionId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mode }),
+      }).catch(() => {});
+    }
     try {
       const res = await fetch("/api/interviews", {
         method: "POST",

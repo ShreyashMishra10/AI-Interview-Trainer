@@ -14,10 +14,6 @@ interface ActionCardProps {
   href:      string;
 }
 
-interface FeedbackItemProps {
-  type: "CRITICAL" | "STRENGTH" | "INFO";
-  text: string;
-}
 
 interface Profile {
   full_name:          string | null;
@@ -103,19 +99,19 @@ function ActivityHeatmap({ interviewDates }: { interviewDates: Set<string> }) {
   }, []);
 
   const todayStr = new Date().toISOString().split("T")[0];
-  const CELL = 11;
-  const GAP  = 3;
+  const CELL = 9;
+  const GAP  = 2;
 
   return (
     <div className="w-full">
-      <div className="overflow-x-auto pb-2 w-full">
-        <div style={{ minWidth: `${weeks.length * (CELL + GAP) + 36}px`, width: "max-content" }}>
-          <div className="flex ml-9 mb-1.5" style={{ gap: `${GAP}px` }}>
+      <div className="w-full overflow-x-auto scrollbar-none">
+        <div style={{ minWidth: "580px" }}>
+          <div className="flex ml-8 mb-1" style={{ gap: `${GAP}px` }}>
             {weeks.map((_week, wi) => {
               const label = monthLabels.find((l) => l.weekIndex === wi);
               return (
                 <div key={wi} style={{ width: `${CELL}px`, flexShrink: 0, overflow: "visible" }}
-                  className="text-[9px] text-zinc-600 font-semibold whitespace-nowrap">
+                  className="text-[8px] text-zinc-600 font-semibold whitespace-nowrap">
                   {label ? label.month : ""}
                 </div>
               );
@@ -123,10 +119,10 @@ function ActivityHeatmap({ interviewDates }: { interviewDates: Set<string> }) {
           </div>
 
           <div className="flex gap-1">
-            <div className="flex flex-col shrink-0" style={{ gap: `${GAP}px`, width: "28px" }}>
+            <div className="flex flex-col shrink-0" style={{ gap: `${GAP}px`, width: "24px" }}>
               {DAYS.map((d, i) => (
                 <div key={d} style={{ height: `${CELL}px` }}
-                  className="text-[9px] text-zinc-700 font-medium flex items-center justify-end pr-1">
+                  className="text-[8px] text-zinc-700 font-medium flex items-center justify-end pr-1">
                   {i % 2 === 0 ? d : ""}
                 </div>
               ))}
@@ -160,7 +156,7 @@ function ActivityHeatmap({ interviewDates }: { interviewDates: Set<string> }) {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 mt-3 ml-9">
+          <div className="flex items-center gap-2 mt-3 ml-8">
             <span className="text-[10px] text-zinc-700">No interview</span>
             <div style={{ width: CELL, height: CELL }} className="rounded-[2px] bg-zinc-800/70" />
             <div style={{ width: CELL, height: CELL }} className="rounded-[2px] bg-amber-400/40" />
@@ -210,7 +206,7 @@ export default function DashboardPage() {
   const readiness    = profile ? calculateReadiness(profile) : 0;
   const firstName    = profile?.full_name?.split(" ")[0] ?? "there";
   const latestRole   = sessions[0]?.job_role ?? null;
-  const recentDone   = sessions.filter((s) => s.status === "completed").slice(0, 4);
+  const recentDone   = sessions.slice(0, 4);
 
   if (loading) {
     return (
@@ -325,22 +321,22 @@ export default function DashboardPage() {
           {/* Recent Sessions / Feedback Feed */}
           <section className="h-[460px] p-8 flex flex-col
             bg-[#08080e] border border-zinc-800/60 rounded-3xl relative overflow-hidden
-            before:absolute before:inset-0 before:bg-[radial-gradient(ellipse_at_top_right,rgba(251,191,36,0.03),transparent_60%)]">
+            before:absolute before:inset-0 before:pointer-events-none before:bg-[radial-gradient(ellipse_at_top_right,rgba(251,191,36,0.03),transparent_60%)]">
             <div className="flex items-center justify-between mb-8">
               <h3 className="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.3em]">
                 Recent Sessions
               </h3>
               <Link href="/dashboard/interviews"
-                className="text-[9px] text-zinc-600 hover:text-amber-400 transition-colors font-bold uppercase tracking-widest">
+                className="px-3 py-1.5 rounded-lg border border-zinc-800 hover:border-amber-500/40 hover:text-amber-400 text-zinc-500 text-[10px] font-semibold uppercase tracking-widest transition-all">
                 View all →
               </Link>
             </div>
 
-            <div className="flex-1 overflow-y-auto pr-2 space-y-3 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-zinc-800">
+            <div className="flex-1 overflow-y-auto pr-2 flex flex-col gap-3 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-zinc-800">
               {recentDone.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full gap-3 text-center">
                   <Mic2 size={24} className="text-zinc-700" />
-                  <p className="text-zinc-600 text-xs font-medium">No completed sessions yet.</p>
+                  <p className="text-zinc-600 text-xs font-medium">No sessions yet.</p>
                   <Link href="/dashboard/interviews"
                     className="text-[10px] text-amber-500 hover:text-amber-400 font-bold uppercase tracking-widest transition-colors">
                     Start your first interview →
@@ -348,11 +344,23 @@ export default function DashboardPage() {
                 </div>
               ) : (
                 recentDone.map((s) => (
-                  <FeedbackItem
-                    key={s.id}
-                    type={s.score && s.score >= 70 ? "STRENGTH" : s.score ? "CRITICAL" : "INFO"}
-                    text={`${s.job_role} · ${s.experience_level} · ${s.mode} mode${s.score ? ` · Score: ${s.score}%` : ""}`}
-                  />
+                  <Link key={s.id} href={`/dashboard/interviews/${s.id}`}>
+                    <div className="p-4 rounded-xl border border-zinc-800/60 bg-zinc-900/40 hover:border-amber-500/20 hover:bg-zinc-900/70 transition-all duration-200 cursor-pointer group">
+                      <div className="flex items-center justify-between mb-1">
+                        <p className="text-xs font-semibold text-zinc-200 truncate group-hover:text-white transition-colors">{s.job_role}</p>
+                        {s.score !== null ? (
+                          <span className={`text-[11px] font-bold ml-2 shrink-0 ${s.score >= 70 ? "text-emerald-400" : "text-red-400"}`}>
+                            {s.score}/100
+                          </span>
+                        ) : (
+                          <span className={`text-[10px] ml-2 shrink-0 font-medium ${s.status === "completed" ? "text-zinc-600" : "text-amber-500"}`}>
+                            {s.status === "completed" ? "No score" : "In progress"}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[10px] text-zinc-600 capitalize">{s.experience_level} · {s.mode} mode</p>
+                    </div>
+                  </Link>
                 ))
               )}
             </div>
@@ -401,28 +409,3 @@ function ActionCard({ title, icon, subtitle, href }: ActionCardProps) {
   );
 }
 
-function FeedbackItem({ type, text }: FeedbackItemProps) {
-  const isStrength = type === "STRENGTH";
-  const isCritical = type === "CRITICAL";
-  return (
-    <div className={`p-4 rounded-xl border transition-all duration-300 group cursor-default ${
-      isCritical
-        ? "bg-red-500/4 border-red-500/10 hover:border-red-500/25 hover:bg-red-500/7"
-        : isStrength
-          ? "bg-amber-400/3 border-amber-400/10 hover:border-amber-400/25 hover:bg-amber-400/6"
-          : "bg-zinc-900/40 border-zinc-800/60 hover:border-zinc-700"
-    }`}>
-      <div className="flex items-center gap-2 mb-2">
-        <div className={`w-1 h-1 rounded-full ${isCritical ? "bg-red-400" : isStrength ? "bg-amber-400" : "bg-zinc-600"}`} />
-        <p className={`text-[9px] font-bold uppercase tracking-[0.2em] ${
-          isCritical ? "text-red-500/80" : isStrength ? "text-amber-500/70" : "text-zinc-500"
-        }`}>
-          {isCritical ? "Needs Work" : isStrength ? "Strong Result" : "Session"}
-        </p>
-      </div>
-      <p className="text-xs text-zinc-500 leading-relaxed font-medium group-hover:text-zinc-400 transition-colors">
-        {text}
-      </p>
-    </div>
-  );
-}

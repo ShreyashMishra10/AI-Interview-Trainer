@@ -2,9 +2,11 @@ import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 
-// PATCH /api/interviews/sessions/[id] — mark session completed
+const ALLOWED_MODES = new Set(["chat", "voice"]);
+
+// PATCH /api/interviews/sessions/[id] — update mode or mark completed
 export async function PATCH(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { userId } = await auth();
@@ -12,12 +14,20 @@ export async function PATCH(
 
   const { id } = await params;
 
+  let body: Record<string, unknown> = {};
+  try { body = await req.json(); } catch { /* no body = mark completed */ }
+
+  const updates: Record<string, unknown> = {};
+  if (typeof body.mode === "string" && ALLOWED_MODES.has(body.mode)) {
+    updates.mode = body.mode;
+  } else {
+    updates.status       = "completed";
+    updates.completed_at = new Date().toISOString();
+  }
+
   const { data, error } = await supabaseAdmin
     .from("interview_sessions")
-    .update({
-      status:       "completed",
-      completed_at: new Date().toISOString(),
-    })
+    .update(updates)
     .eq("id", id)
     .eq("clerk_user_id", userId)
     .select("id");

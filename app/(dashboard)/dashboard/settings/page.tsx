@@ -48,10 +48,10 @@ export default function SettingsPage() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all text-left ${
+                className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors text-left border cursor-pointer ${
                   activeTab === tab.id
-                    ? "bg-amber-400/10 text-amber-400 border border-amber-400/15"
-                    : "text-zinc-500 hover:text-zinc-300 hover:bg-zinc-900/50"
+                    ? "bg-amber-400/10 text-amber-400 border-amber-400/15"
+                    : "text-zinc-500 hover:text-zinc-300 hover:bg-zinc-900/50 border-transparent"
                 }`}
               >
                 <span className={activeTab === tab.id ? "text-amber-400" : "text-zinc-600"}>{tab.icon}</span>

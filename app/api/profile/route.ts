@@ -62,6 +62,15 @@ export async function PATCH(req: NextRequest) {
   if (typeof body.full_name === "string")
     allowedFields.full_name = body.full_name.trim().slice(0, 200);
 
+  if (typeof body.bio === "string")
+    allowedFields.bio = body.bio.trim().slice(0, 500);
+
+  if (typeof body.target_role === "string")
+    allowedFields.target_role = body.target_role.trim().slice(0, 100);
+
+  if (typeof body.experience_level === "string")
+    allowedFields.experience_level = body.experience_level.trim().slice(0, 50);
+
   if (typeof body.email === "string") {
     const email = body.email.trim().slice(0, 200);
     if (!EMAIL_RE.test(email))
