@@ -19,13 +19,19 @@ export function useVoice({ onTranscript }: UseVoiceOptions) {
 
   useEffect(() => { onTranscriptRef.current = onTranscript; }, [onTranscript]);
 
-  // Cancel everything when the component unmounts (navigation, back, reload)
+  // Cancel everything on unmount (back/navigation) AND on browser reload
   useEffect(() => {
-    return () => {
+    const stopAll = () => {
       shouldListenRef.current = false;
       recognitionRef.current?.stop();
       recognitionRef.current = null;
       synthRef.current?.cancel();
+    };
+
+    window.addEventListener("beforeunload", stopAll);
+    return () => {
+      window.removeEventListener("beforeunload", stopAll);
+      stopAll();
     };
   }, []);
 
