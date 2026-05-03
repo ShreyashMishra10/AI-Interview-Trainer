@@ -16,7 +16,11 @@ import {
   CheckCircle2,
   User,
   Bot,
+  Camera,
+  CameraOff,
 } from "lucide-react";
+
+type CameraStatus = "idle" | "checking" | "granted" | "denied";
 
 interface Message {
   role: "user" | "assistant";
@@ -208,7 +212,30 @@ function InterviewSessionContent() {
   const [autoSpeak, setAutoSpeak] = useState(true);
   const [started, setStarted] = useState(false);
   const [confirmEnd, setConfirmEnd] = useState(false);
+  const [cameraStatus, setCameraStatus] = useState<CameraStatus>("idle");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const previewStreamRef = useRef<MediaStream | null>(null);
+  const previewVideoRef = useRef<HTMLVideoElement>(null);
+
+  const requestCamera = useCallback(async () => {
+    setCameraStatus("checking");
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      previewStreamRef.current = stream;
+      if (previewVideoRef.current) previewVideoRef.current.srcObject = stream;
+      setCameraStatus("granted");
+    } catch {
+      setCameraStatus("denied");
+    }
+  }, []);
+
+  // Auto-request camera on mount
+  useEffect(() => {
+    requestCamera();
+    return () => {
+      previewStreamRef.current?.getTracks().forEach((t) => t.stop());
+    };
+  }, [requestCamera]);
 
   const {
     isListening,
@@ -292,6 +319,9 @@ function InterviewSessionContent() {
   );
 
   const startInterview = useCallback(async () => {
+    // Release pre-start camera stream — WebcamFeed opens its own
+    previewStreamRef.current?.getTracks().forEach((t) => t.stop());
+    previewStreamRef.current = null;
     setStarted(true);
     setIsLoading(true);
     if (sessionId) {
@@ -356,28 +386,77 @@ function InterviewSessionContent() {
   // ── Pre-start screen ─────────────────────────────────────────────────────────
   if (!started) {
     return (
-      <div className="fixed inset-0 bg-[#0d0d14] flex items-center justify-center p-6">
-        <div className="w-full max-w-md text-center">
+      <div className="fixed inset-0 bg-[#0d0d14] flex items-center justify-center p-6 overflow-y-auto">
+        <div className="w-full max-w-md text-center py-6">
           <button
             onClick={() => router.back()}
-            className="flex items-center gap-2 text-[#7A7A9A] hover:text-white transition mb-10 mx-auto text-sm"
+            className="flex items-center gap-2 text-[#7A7A9A] hover:text-white transition mb-8 mx-auto text-sm"
           >
             <ChevronLeft size={16} /> Back
           </button>
-          <div className="w-24 h-24 rounded-full bg-[#6C63FF]/15 border border-[#6C63FF]/30 flex items-center justify-center mx-auto mb-6">
-            <Bot size={40} className="text-[#6C63FF]" />
-          </div>
-          <h1 className="text-2xl font-bold text-white mb-1">
-            Ready to Begin?
-          </h1>
+
+          <h1 className="text-2xl font-bold text-white mb-1">Ready to Begin?</h1>
           <p className="text-[#7A7A9A] text-sm mb-1">
-            AI Interviewer for{" "}
-            <span className="text-[#6C63FF] font-medium">{role}</span>
+            AI Interviewer for <span className="text-[#6C63FF] font-medium">{role}</span>
           </p>
-          <p className="text-[#4A4A6A] text-xs mb-8">
-            {candidateName} · {experience}
-          </p>
-          <div className="flex gap-2 mb-8 bg-[#12121a] rounded-xl p-1.5 border border-[#272731]">
+          <p className="text-[#4A4A6A] text-xs mb-6">{candidateName} · {experience}</p>
+
+          {/* ── Camera check ── */}
+          <div className="mb-6 bg-[#12121a] border border-[#272731] rounded-xl overflow-hidden">
+            <div className="px-4 pt-4 pb-2 flex items-center gap-2">
+              <Camera size={14} className={cameraStatus === "granted" ? "text-emerald-400" : "text-[#7A7A9A]"} />
+              <span className="text-xs font-semibold text-[#7A7A9A] uppercase tracking-widest">Camera Check</span>
+              {cameraStatus === "granted" && (
+                <span className="ml-auto text-[10px] text-emerald-400 font-bold">● READY</span>
+              )}
+            </div>
+
+            {/* Preview */}
+            <div className="relative w-full aspect-video bg-[#0d0d14]">
+              <video
+                ref={previewVideoRef}
+                autoPlay
+                muted
+                playsInline
+                className={`w-full h-full object-cover scale-x-[-1] ${cameraStatus === "granted" ? "block" : "hidden"}`}
+              />
+              {cameraStatus !== "granted" && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
+                  {cameraStatus === "checking" && (
+                    <>
+                      <Loader2 size={24} className="text-[#6C63FF] animate-spin" />
+                      <p className="text-xs text-[#7A7A9A]">Requesting camera access...</p>
+                    </>
+                  )}
+                  {cameraStatus === "denied" && (
+                    <>
+                      <CameraOff size={28} className="text-red-400" />
+                      <p className="text-xs text-red-400 font-medium">Camera access denied</p>
+                      <p className="text-[10px] text-[#4A4A6A] px-6">Allow camera in your browser settings, then try again.</p>
+                      <button
+                        onClick={requestCamera}
+                        className="mt-1 px-4 py-1.5 rounded-lg bg-[#1c1c26] border border-[#272731] text-xs text-[#7A7A9A] hover:text-white transition"
+                      >
+                        Try Again
+                      </button>
+                    </>
+                  )}
+                  {cameraStatus === "idle" && (
+                    <>
+                      <Camera size={28} className="text-[#4A4A6A]" />
+                      <p className="text-xs text-[#7A7A9A]">Camera not started</p>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+            <p className="text-[10px] text-[#4A4A6A] px-4 py-3">
+              Camera is required for the interview session. Your video is never recorded or stored.
+            </p>
+          </div>
+
+          {/* Mode selector */}
+          <div className="flex gap-2 mb-6 bg-[#12121a] rounded-xl p-1.5 border border-[#272731]">
             <button
               onClick={() => setMode("chat")}
               className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all ${mode === "chat" ? "bg-[#6C63FF] text-white" : "text-[#7A7A9A] hover:text-white"}`}
@@ -391,32 +470,26 @@ function InterviewSessionContent() {
               <Radio size={15} /> Voice Mode
             </button>
           </div>
-          <div className="bg-[#12121a] border border-[#272731] rounded-xl p-4 mb-8 text-left space-y-2.5">
+
+          <div className="bg-[#12121a] border border-[#272731] rounded-xl p-4 mb-6 text-left space-y-2.5">
             {[
               "10 tailored questions based on your role & experience",
               "Real-time feedback after each answer",
               "Final assessment with strengths & improvements",
-              mode === "voice"
-                ? "Speak answers — AI listens & responds aloud"
-                : "Type answers in the chat panel",
+              mode === "voice" ? "Speak answers — AI listens & responds aloud" : "Type answers in the chat panel",
             ].map((t, i) => (
-              <div
-                key={i}
-                className="flex items-start gap-2 text-xs text-[#7A7A9A]"
-              >
-                <CheckCircle2
-                  size={13}
-                  className="text-[#6C63FF] mt-0.5 shrink-0"
-                />{" "}
-                {t}
+              <div key={i} className="flex items-start gap-2 text-xs text-[#7A7A9A]">
+                <CheckCircle2 size={13} className="text-[#6C63FF] mt-0.5 shrink-0" /> {t}
               </div>
             ))}
           </div>
+
           <button
             onClick={startInterview}
-            className="w-full py-3.5 rounded-xl bg-[#6C63FF] hover:bg-[#7C74FF] text-white font-semibold transition-all text-sm shadow-lg shadow-[#6C63FF]/20"
+            disabled={cameraStatus !== "granted"}
+            className="w-full py-3.5 rounded-xl bg-[#6C63FF] hover:bg-[#7C74FF] disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold transition-all text-sm shadow-lg shadow-[#6C63FF]/20"
           >
-            Start Interview →
+            {cameraStatus === "checking" ? "Waiting for camera..." : cameraStatus === "denied" ? "Camera required to start" : "Start Interview →"}
           </button>
         </div>
       </div>
