@@ -110,6 +110,14 @@ export function useVoice({ onTranscript }: UseVoiceOptions) {
   const speak = useCallback((text: string, onEnd?: () => void) => {
     if (!synthRef.current) return;
     synthRef.current.cancel();
+
+    // Pause mic while AI speaks to prevent echo feedback
+    const wasListening = shouldListenRef.current;
+    if (wasListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+    }
+
     const u = new SpeechSynthesisUtterance(text);
     u.rate   = 0.95;
     u.pitch  = 1;
@@ -120,10 +128,26 @@ export function useVoice({ onTranscript }: UseVoiceOptions) {
     );
     if (preferred) u.voice = preferred;
     u.onstart = () => setIsSpeaking(true);
-    u.onend   = () => { setIsSpeaking(false); onEnd?.(); };
-    u.onerror = () => setIsSpeaking(false);
+    u.onend = () => {
+      setIsSpeaking(false);
+      onEnd?.();
+      // Resume mic after AI finishes speaking
+      if (wasListening && shouldListenRef.current) {
+        const next = createRecognition();
+        recognitionRef.current = next;
+        try { next.start(); } catch { /* already starting */ }
+      }
+    };
+    u.onerror = () => {
+      setIsSpeaking(false);
+      if (wasListening && shouldListenRef.current) {
+        const next = createRecognition();
+        recognitionRef.current = next;
+        try { next.start(); } catch { /* already starting */ }
+      }
+    };
     synthRef.current.speak(u);
-  }, []);
+  }, [createRecognition]);
 
   const stopSpeaking = useCallback(() => {
     synthRef.current?.cancel();

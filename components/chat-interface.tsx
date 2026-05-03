@@ -26,21 +26,37 @@ export function ChatInterface() {
     if (el) el.scrollTop = el.scrollHeight;
   }, [message, isLoading]);
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (!input.trim() || isLoading || (messageCount >= 3 && !isLoggedIn)) return;
 
-    setMessage((prev) => [...prev, { role: "user", message: input }]);
+    const userMessage = input.trim();
+    const updatedMessages = [...message, { role: "user", message: userMessage }];
+    setMessage(updatedMessages);
     setInput("");
     setIsLoading(true);
     setMessageCount((prev) => prev + 1);
 
-    setTimeout(() => {
+    try {
+      const res = await fetch("/api/demo-chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: updatedMessages.map((m) => ({ role: m.role, content: m.message })),
+        }),
+      });
+      const data = await res.json();
       setMessage((prev) => [
         ...prev,
-        { role: "assistant", message: "That sounds challenging. How did you measure the success of your solution?" },
+        { role: "assistant", message: data.reply ?? "Great answer! Tell me about a challenging project you've worked on." },
       ]);
+    } catch {
+      setMessage((prev) => [
+        ...prev,
+        { role: "assistant", message: "Interesting! Can you walk me through your problem-solving process?" },
+      ]);
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   return (
