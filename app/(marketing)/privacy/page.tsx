@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Shield, ChevronRight, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { Footer } from "@/components/Footer";
 
 const SECTIONS = [
   { id: "overview",    title: "Overview"                    },
@@ -269,16 +270,10 @@ export default function PrivacyPolicyPage() {
                 </div>
               </div>
             </Section>
-
-            <footer className="border-t border-border pt-8 mt-12 mb-20 text-center">
-              <p className="text-xs text-muted-foreground">
-                © 2026 AI-Interview Trainer
-              </p>
-            </footer>
-
           </div>
         </div>
       </div>
+      <Footer/>
     </div>
   );
 }

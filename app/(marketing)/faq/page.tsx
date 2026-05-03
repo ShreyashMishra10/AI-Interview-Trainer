@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { HelpCircle, ChevronRight, ArrowLeft, ChevronDown, ChevronUp } from "lucide-react";
 import Link from "next/link";
+import { Footer } from "@/components/Footer";
 
 const SECTIONS = [
   { id: "general",     title: "General"            },
@@ -286,18 +287,11 @@ export default function FaqPage() {
               />
             ))}
 
-            <footer className="border-t border-border pt-8 mt-12 mb-20 text-center">
-              <p className="text-xs text-muted-foreground">
-                Still have questions?{" "}
-                <a href="mailto:support@ai-trainer.com" className="text-amber-500 hover:underline">
-                  support@ai-trainer.com
-                </a>
-              </p>
-            </footer>
           </div>
 
         </div>
       </div>
+            <Footer/>
     </div>
   );
 }

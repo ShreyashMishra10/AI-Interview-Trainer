@@ -108,7 +108,7 @@ export function Footer() {
               <ul className="space-y-4 text-[13px] text-zinc-500">
                 <li>
                   <a
-                    href="https://linkedin.com"
+                    href="https://www.linkedin.com/in/shreyash-mishra-940815297/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="hover:text-white transition-colors"
@@ -128,7 +128,7 @@ export function Footer() {
                 </li>
                 <li>
                   <a
-                    href="https://github.com"
+                    href="https://github.com/ShreyashMishra10"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="hover:text-white transition-colors"

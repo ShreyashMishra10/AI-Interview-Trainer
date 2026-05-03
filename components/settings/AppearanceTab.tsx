@@ -110,13 +110,6 @@ export function AppearanceTab() {
     applyCompact(value);
   };
 
-  const handleLanguage = (value: string) => {
-    setLanguage(value);
-    localStorage.setItem("appearance_language", value);
-    const lang = LANGUAGES.find((l) => l.label === value)?.code ?? "en";
-    document.documentElement.lang = lang;
-  };
-
   const handleTimezone = (value: string) => {
     setTimezone(value);
     localStorage.setItem("appearance_timezone", value);
@@ -203,18 +196,19 @@ export function AppearanceTab() {
 
       {/* Language & Region */}
       <SettingSection title="Language & Region">
-        <SettingRow label="Display Language" description="Language preference (interface translation coming soon)">
-          <div className="flex items-center gap-2">
+        <SettingRow label="Display Language" description="Interface translations are coming in a future update">
+          <div className="flex items-center gap-2 opacity-40 cursor-not-allowed" title="Coming soon">
             <Globe size={14} className="text-zinc-600" />
             <select
+              disabled
               value={language}
-              onChange={(e) => handleLanguage(e.target.value)}
-              className="bg-[#0d0d16] border border-zinc-800 rounded-lg px-3 py-1.5 text-xs text-zinc-300 outline-none cursor-pointer"
+              className="bg-[#0d0d16] border border-zinc-800 rounded-lg px-3 py-1.5 text-xs text-zinc-300 outline-none cursor-not-allowed"
             >
               {LANGUAGES.map((l) => (
                 <option key={l.code} value={l.label}>{l.label}</option>
               ))}
             </select>
+            <span className="text-[8px] bg-zinc-800 text-zinc-500 px-1.5 py-0.5 rounded font-bold tracking-wide">SOON</span>
           </div>
         </SettingRow>
         <SettingRow label="Timezone" description="Used for session scheduling and activity timestamps">
