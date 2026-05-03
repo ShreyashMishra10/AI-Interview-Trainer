@@ -30,11 +30,33 @@ export async function PATCH(
     .update(updates)
     .eq("id", id)
     .eq("clerk_user_id", userId)
-    .select("id");
+    .select("id, job_role, score");
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   if (!data || data.length === 0)
     return NextResponse.json({ error: "Session not found" }, { status: 404 });
+
+  // Insert a "session complete" notification if the user has that pref enabled
+  if (updates.status === "completed") {
+    const session = data[0];
+    const { data: profile } = await supabaseAdmin
+      .from("profiles")
+      .select("notification_prefs")
+      .eq("clerk_user_id", userId)
+      .single();
+
+    const prefs = (profile?.notification_prefs ?? {}) as Record<string, boolean>;
+    if (prefs.sessionComplete !== false) {
+      await supabaseAdmin.from("notifications").insert({
+        clerk_user_id: userId,
+        type:    "interview",
+        title:   `Interview Complete: ${session.job_role}`,
+        message: session.score != null
+          ? `You scored ${session.score}/100.`
+          : "Your session has been saved.",
+      });
+    }
+  }
 
   return NextResponse.json({ success: true });
 }

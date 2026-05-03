@@ -22,8 +22,8 @@ export const PerformanceGauge = ({ percentage = 85 }: { percentage?: number }) =
       >
         <defs>
           <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#b8912e" />
-            <stop offset="100%" stopColor="#f5d17a" />
+            <stop offset="0%"   stopColor="var(--gauge-start, #b8912e)" />
+            <stop offset="100%" stopColor="var(--gauge-end,   #f5d17a)" />
           </linearGradient>
         </defs>
         

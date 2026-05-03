@@ -137,17 +137,23 @@ function ActivityHeatmap({ interviewDates }: { interviewDates: Set<string> }) {
                     const hasInterview = interviewDates.has(dateStr);
                     const inYear       = date.getFullYear() === new Date().getFullYear();
 
+                    const isActive = hasInterview && inYear && !isFuture;
+
                     let cellClass = "";
-                    if (!inYear)        cellClass = "bg-zinc-900/20";
-                    else if (isFuture)  cellClass = "bg-zinc-800/30";
-                    else if (hasInterview) cellClass = "bg-amber-400/85 shadow-[0_0_6px_rgba(251,191,36,0.65)] hover:bg-amber-300 hover:shadow-[0_0_10px_rgba(251,191,36,0.9)] cursor-pointer";
-                    else                cellClass = "bg-zinc-800/70 hover:bg-zinc-700/70";
+                    if (!inYear)       cellClass = "bg-zinc-900/20";
+                    else if (isFuture) cellClass = "bg-zinc-800/30";
+                    else if (isActive) cellClass = "bg-amber-400/85 cursor-pointer";
+                    else               cellClass = "bg-zinc-800/70 hover:bg-zinc-700/70";
 
                     return (
                       <div key={dateStr}
                         title={hasInterview ? `✓ Interview — ${dateStr}` : dateStr}
-                        style={{ width: `${CELL}px`, height: `${CELL}px` }}
-                        className={`rounded-[2px] transition-all duration-150 ${cellClass} ${isToday ? "ring-1 ring-amber-400/60" : ""}`}
+                        style={{
+                          width:     `${CELL}px`,
+                          height:    `${CELL}px`,
+                          boxShadow: isActive  ? `0 0 6px var(--accent-glow2)` : undefined,
+                        }}
+                        className={`rounded-xs transition-all duration-150 ${cellClass} ${isToday ? "ring-1 ring-amber-400/60" : ""}`}
                       />
                     );
                   })}
@@ -158,9 +164,9 @@ function ActivityHeatmap({ interviewDates }: { interviewDates: Set<string> }) {
 
           <div className="flex items-center gap-2 mt-3 ml-8">
             <span className="text-[10px] text-zinc-700">No interview</span>
-            <div style={{ width: CELL, height: CELL }} className="rounded-[2px] bg-zinc-800/70" />
-            <div style={{ width: CELL, height: CELL }} className="rounded-[2px] bg-amber-400/40" />
-            <div style={{ width: CELL, height: CELL }} className="rounded-[2px] bg-amber-400/85 shadow-[0_0_6px_rgba(251,191,36,0.5)]" />
+            <div style={{ width: CELL, height: CELL }} className="rounded-xs bg-zinc-800/70" />
+            <div style={{ width: CELL, height: CELL }} className="rounded-xs bg-amber-400/40" />
+            <div style={{ width: CELL, height: CELL, boxShadow: "0 0 6px var(--accent-glow2)" }} className="rounded-xs bg-amber-400/85" />
             <span className="text-[10px] text-zinc-700">Interview done</span>
           </div>
         </div>
@@ -212,7 +218,7 @@ export default function DashboardPage() {
     return (
       <div className="flex items-center justify-center h-[60vh]">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 rounded-full border-2 border-amber-400/30 border-t-amber-400 animate-spin" />
+          <div className="w-12 h-12 rounded-full border-[3px] border-zinc-700 border-t-amber-400 animate-spin" />
           <p className="text-zinc-600 text-xs uppercase tracking-widest font-medium">Loading dashboard…</p>
         </div>
       </div>
@@ -271,10 +277,12 @@ export default function DashboardPage() {
                 Interview Readiness Score
               </h2>
               <PerformanceGauge percentage={readiness} />
-              <div className="mt-8 px-6 py-2 bg-amber-400/8 border border-amber-400/20
-                text-amber-500/80 text-[11px] font-bold uppercase tracking-widest
-                rounded-full mx-auto w-fit hover:bg-amber-400/12 transition-all cursor-default
-                shadow-[0_0_20px_rgba(251,191,36,0.08)]">
+              <div
+                style={{ boxShadow: "0 0 20px var(--accent-glow)" }}
+                className="mt-8 px-6 py-2 bg-amber-400/8 border border-amber-400/20
+                  text-amber-500/80 text-[11px] font-bold uppercase tracking-widest
+                  rounded-full mx-auto w-fit hover:bg-amber-400/12 transition-all cursor-default"
+              >
                 {readiness >= 80 ? "Interview Ready" : readiness >= 50 ? "Building Momentum" : "Getting Started"}
               </div>
             </div>

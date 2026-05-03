@@ -8,6 +8,19 @@ import { Zap, Target, BarChart3, ArrowRight } from "lucide-react";
 export const metadata: Metadata = {
   title: "About — AI-Trainer",
   description: "Learn about AI-Trainer, founded by Shreyash Mishra. Our mission is to democratize elite technical interview coaching using AI.",
+  keywords: ["about AI-Trainer", "Shreyash Mishra", "AI interview platform", "interview coaching AI", "tech startup India"],
+  alternates: { canonical: "https://ai-interview-trainer.com/about" },
+  openGraph: {
+    title:       "About AI-Trainer — Our Mission & Story",
+    description: "Meet the team behind AI-Trainer. Built to help engineers land their dream job through AI-powered mock interviews, voice mode, and smart CV generation.",
+    url:         "https://ai-interview-trainer.com/about",
+    type:        "website",
+  },
+  twitter: {
+    card:        "summary_large_image",
+    title:       "About AI-Trainer — Our Mission & Story",
+    description: "Meet the team behind AI-Trainer. Built to help engineers land their dream job with AI-powered mock interviews.",
+  },
 };
 
 const PILLARS = [

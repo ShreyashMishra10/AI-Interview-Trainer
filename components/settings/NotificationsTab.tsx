@@ -52,7 +52,11 @@ export function NotificationsTab() {
     fetch("/api/profile")
       .then((r) => r.json())
       .then((d) => {
-        if (d.notification_prefs) setPrefs({ ...DEFAULTS, ...d.notification_prefs });
+        if (d.notification_prefs) {
+          const merged = { ...DEFAULTS, ...d.notification_prefs };
+          setPrefs(merged);
+          localStorage.setItem("notif_sound", String(merged.sound));
+        }
       })
       .catch(console.error)
       .finally(() => setLoading(false));
@@ -81,7 +85,10 @@ export function NotificationsTab() {
   const toggle = (key: keyof NotifPrefs) => {
     const next = { ...prefs, [key]: !prefs[key] };
     setPrefs(next);
-    if (key === "sound" && next.sound) playBeep();
+    if (key === "sound") {
+      localStorage.setItem("notif_sound", String(next.sound));
+      if (next.sound) playBeep();
+    }
     savePrefs(next);
   };
 

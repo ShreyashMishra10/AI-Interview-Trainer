@@ -1,0 +1,130 @@
+/* Global accent color overrides — loaded on every page via root layout.
+   Replaces amber-400/500 text, bg, border when data-accent is set on <html>. */
+
+/* ── CSS custom properties for elements that can't use class overrides ── */
+:root {
+  --gauge-start:  #b8912e;
+  --gauge-end:    #f5d17a;
+  --accent-glow:  rgba(251, 191, 36, 0.08);
+  --accent-glow2: rgba(251, 191, 36, 0.5);
+}
+[data-accent="violet"]  {
+  --gauge-start:  #7c3aed; --gauge-end: #a78bfa;
+  --accent-glow:  rgba(139, 92,  246, 0.08);
+  --accent-glow2: rgba(139, 92,  246, 0.5);
+}
+[data-accent="emerald"] {
+  --gauge-start:  #059669; --gauge-end: #34d399;
+  --accent-glow:  rgba(16,  185, 129, 0.08);
+  --accent-glow2: rgba(16,  185, 129, 0.5);
+}
+[data-accent="blue"]    {
+  --gauge-start:  #2563eb; --gauge-end: #60a5fa;
+  --accent-glow:  rgba(59,  130, 246, 0.08);
+  --accent-glow2: rgba(59,  130, 246, 0.5);
+}
+[data-accent="rose"]    {
+  --gauge-start:  #e11d48; --gauge-end: #fb7185;
+  --accent-glow:  rgba(244, 63,  94,  0.08);
+  --accent-glow2: rgba(244, 63,  94,  0.5);
+}
+
+[data-accent="violet"] .text-amber-400,
+[data-accent="violet"] .text-amber-400\/90,
+[data-accent="violet"] .text-amber-500,
+[data-accent="violet"] .text-amber-500\/80 { color: #a78bfa !important; }
+[data-accent="violet"] .bg-amber-400,
+[data-accent="violet"] .bg-amber-500       { background-color: #8b5cf6 !important; }
+[data-accent="violet"] .border-amber-400,
+[data-accent="violet"] .border-t-amber-400,
+[data-accent="violet"] .border-amber-500   { border-color: #a78bfa !important; }
+[data-accent="violet"] .bg-amber-400\/8,
+[data-accent="violet"] .bg-amber-400\/10,
+[data-accent="violet"] .bg-amber-400\/15,
+[data-accent="violet"] .bg-amber-400\/20,
+[data-accent="violet"] .bg-amber-500\/10,
+[data-accent="violet"] .bg-amber-500\/20   { background-color: rgb(139 92 246 / 0.12) !important; }
+[data-accent="violet"] .bg-amber-400\/40   { background-color: rgb(139 92 246 / 0.40) !important; }
+[data-accent="violet"] .bg-amber-400\/85   { background-color: rgb(139 92 246 / 0.85) !important; }
+[data-accent="violet"] .ring-amber-400\/60 { --tw-ring-color: rgb(167 139 250 / 0.6) !important; }
+[data-accent="violet"] .border-amber-400\/15,
+[data-accent="violet"] .border-amber-400\/20,
+[data-accent="violet"] .border-amber-400\/25,
+[data-accent="violet"] .border-amber-400\/30,
+[data-accent="violet"] .border-amber-400\/40,
+[data-accent="violet"] .border-amber-500\/20 { border-color: rgb(167 139 250 / 0.25) !important; }
+
+[data-accent="emerald"] .text-amber-400,
+[data-accent="emerald"] .text-amber-400\/90,
+[data-accent="emerald"] .text-amber-500,
+[data-accent="emerald"] .text-amber-500\/80 { color: #34d399 !important; }
+[data-accent="emerald"] .bg-amber-400,
+[data-accent="emerald"] .bg-amber-500       { background-color: #10b981 !important; }
+[data-accent="emerald"] .border-amber-400,
+[data-accent="emerald"] .border-t-amber-400,
+[data-accent="emerald"] .border-amber-500   { border-color: #34d399 !important; }
+[data-accent="emerald"] .bg-amber-400\/8,
+[data-accent="emerald"] .bg-amber-400\/10,
+[data-accent="emerald"] .bg-amber-400\/15,
+[data-accent="emerald"] .bg-amber-400\/20,
+[data-accent="emerald"] .bg-amber-500\/10,
+[data-accent="emerald"] .bg-amber-500\/20   { background-color: rgb(16 185 129 / 0.12) !important; }
+[data-accent="emerald"] .bg-amber-400\/40   { background-color: rgb(16 185 129 / 0.40) !important; }
+[data-accent="emerald"] .bg-amber-400\/85   { background-color: rgb(16 185 129 / 0.85) !important; }
+[data-accent="emerald"] .ring-amber-400\/60 { --tw-ring-color: rgb(52 211 153 / 0.6) !important; }
+[data-accent="emerald"] .border-amber-400\/15,
+[data-accent="emerald"] .border-amber-400\/20,
+[data-accent="emerald"] .border-amber-400\/25,
+[data-accent="emerald"] .border-amber-400\/30,
+[data-accent="emerald"] .border-amber-400\/40,
+[data-accent="emerald"] .border-amber-500\/20 { border-color: rgb(52 211 153 / 0.25) !important; }
+
+[data-accent="blue"] .text-amber-400,
+[data-accent="blue"] .text-amber-400\/90,
+[data-accent="blue"] .text-amber-500,
+[data-accent="blue"] .text-amber-500\/80 { color: #60a5fa !important; }
+[data-accent="blue"] .bg-amber-400,
+[data-accent="blue"] .bg-amber-500       { background-color: #3b82f6 !important; }
+[data-accent="blue"] .border-amber-400,
+[data-accent="blue"] .border-t-amber-400,
+[data-accent="blue"] .border-amber-500   { border-color: #60a5fa !important; }
+[data-accent="blue"] .bg-amber-400\/8,
+[data-accent="blue"] .bg-amber-400\/10,
+[data-accent="blue"] .bg-amber-400\/15,
+[data-accent="blue"] .bg-amber-400\/20,
+[data-accent="blue"] .bg-amber-500\/10,
+[data-accent="blue"] .bg-amber-500\/20   { background-color: rgb(59 130 246 / 0.12) !important; }
+[data-accent="blue"] .bg-amber-400\/40   { background-color: rgb(59 130 246 / 0.40) !important; }
+[data-accent="blue"] .bg-amber-400\/85   { background-color: rgb(59 130 246 / 0.85) !important; }
+[data-accent="blue"] .ring-amber-400\/60 { --tw-ring-color: rgb(96 165 250 / 0.6) !important; }
+[data-accent="blue"] .border-amber-400\/15,
+[data-accent="blue"] .border-amber-400\/20,
+[data-accent="blue"] .border-amber-400\/25,
+[data-accent="blue"] .border-amber-400\/30,
+[data-accent="blue"] .border-amber-400\/40,
+[data-accent="blue"] .border-amber-500\/20 { border-color: rgb(96 165 250 / 0.25) !important; }
+
+[data-accent="rose"] .text-amber-400,
+[data-accent="rose"] .text-amber-400\/90,
+[data-accent="rose"] .text-amber-500,
+[data-accent="rose"] .text-amber-500\/80 { color: #fb7185 !important; }
+[data-accent="rose"] .bg-amber-400,
+[data-accent="rose"] .bg-amber-500       { background-color: #f43f5e !important; }
+[data-accent="rose"] .border-amber-400,
+[data-accent="rose"] .border-t-amber-400,
+[data-accent="rose"] .border-amber-500   { border-color: #fb7185 !important; }
+[data-accent="rose"] .bg-amber-400\/8,
+[data-accent="rose"] .bg-amber-400\/10,
+[data-accent="rose"] .bg-amber-400\/15,
+[data-accent="rose"] .bg-amber-400\/20,
+[data-accent="rose"] .bg-amber-500\/10,
+[data-accent="rose"] .bg-amber-500\/20   { background-color: rgb(244 63 94 / 0.12) !important; }
+[data-accent="rose"] .bg-amber-400\/40   { background-color: rgb(244 63 94 / 0.40) !important; }
+[data-accent="rose"] .bg-amber-400\/85   { background-color: rgb(244 63 94 / 0.85) !important; }
+[data-accent="rose"] .ring-amber-400\/60 { --tw-ring-color: rgb(251 113 133 / 0.6) !important; }
+[data-accent="rose"] .border-amber-400\/15,
+[data-accent="rose"] .border-amber-400\/20,
+[data-accent="rose"] .border-amber-400\/25,
+[data-accent="rose"] .border-amber-400\/30,
+[data-accent="rose"] .border-amber-400\/40,
+[data-accent="rose"] .border-amber-500\/20 { border-color: rgb(251 113 133 / 0.25) !important; }

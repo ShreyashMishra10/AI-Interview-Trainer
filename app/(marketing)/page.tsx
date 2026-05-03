@@ -49,6 +49,28 @@ export const metadata: Metadata = {
   },
 };
 
+/* ── Structured data ───────────────────────────────────────── */
+const APP_JSONLD = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "AI-Trainer",
+  applicationCategory: "EducationApplication",
+  operatingSystem: "Web",
+  url: "https://ai-interview-trainer.com",
+  description: "Practice real-time coding, DSA, and behavioral interviews with an AI mentor. Includes CV builder, voice mode, and performance analytics.",
+  offers: {
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "INR",
+    availability: "https://schema.org/InStock",
+  },
+  aggregateRating: {
+    "@type": "AggregateRating",
+    ratingValue: "4.8",
+    ratingCount: "120",
+  },
+};
+
 /* ── Static data (server-safe) ─────────────────────────────── */
 const STATS = [
   { icon: <Trophy   size={20} aria-hidden />, value: "20+",  label: "Job Roles Covered"    },
@@ -133,6 +155,7 @@ export default async function Home() {
 
   return (
     <main>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(APP_JSONLD) }} />
       {/* ── HERO ──────────────────────────────────────────── */}
       <section
         aria-label="Hero"

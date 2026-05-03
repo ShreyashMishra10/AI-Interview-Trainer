@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { User, Lock, Palette, Bell, Shield, CreditCard, ChevronRight } from "lucide-react";
 import { ProfileTab }       from "@/components/settings/ProfileTab";
 import { AccountTab }       from "@/components/settings/AccountTab";
@@ -20,8 +21,16 @@ const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
   { id: "subscription",  label: "Subscription",  icon: <CreditCard size={15} /> },
 ];
 
-export default function SettingsPage() {
-  const [activeTab, setActiveTab] = useState<Tab>("profile");
+function SettingsContent() {
+  const router      = useRouter();
+  const searchParams = useSearchParams();
+
+  const raw      = searchParams.get("tab") as Tab | null;
+  const activeTab: Tab = (raw && TABS.some((t) => t.id === raw)) ? raw : "profile";
+
+  const handleTabChange = (tab: Tab) => {
+    router.replace(`/dashboard/settings?tab=${tab}`, { scroll: false });
+  };
 
   const renderTab = () => {
     switch (activeTab) {
@@ -35,7 +44,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="max-w-[1100px] mx-auto animate-in fade-in duration-700">
+    <div className="max-w-275 mx-auto animate-in fade-in duration-700">
       <div className="py-4 mb-8">
         <h1 className="text-4xl font-serif text-white tracking-tight">Settings</h1>
         <p className="text-zinc-600 mt-1 text-sm">Manage your account, preferences and subscription.</p>
@@ -47,7 +56,7 @@ export default function SettingsPage() {
             {TABS.map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => handleTabChange(tab.id)}
                 className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors text-left border cursor-pointer ${
                   activeTab === tab.id
                     ? "bg-amber-400/10 text-amber-400 border-amber-400/15"
@@ -64,5 +73,13 @@ export default function SettingsPage() {
         <div className="flex-1 min-w-0">{renderTab()}</div>
       </div>
     </div>
+  );
+}
+
+export default function SettingsPage() {
+  return (
+    <Suspense>
+      <SettingsContent />
+    </Suspense>
   );
 }

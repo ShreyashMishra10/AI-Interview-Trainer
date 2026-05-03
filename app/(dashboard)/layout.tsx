@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Sidebar } from "@/components/sidebar";
-import { Search, Bell, Menu, X, Mic2, FileText, Clock, ChevronRight } from "lucide-react";
+import { Search, Bell, Menu, X, Mic2, FileText, Clock, ChevronRight, CreditCard, Info, CheckCheck } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import "./global.css";
@@ -19,6 +19,14 @@ interface CV {
   id:          string;
   target_role: string;
   created_at:  string;
+}
+interface Notification {
+  id:         string;
+  type:       "system" | "payment" | "interview" | "cv";
+  title:      string;
+  message:    string | null;
+  read:       boolean;
+  created_at: string;
 }
 
 function timeAgo(dateStr: string) {
@@ -81,7 +89,7 @@ function SearchModal({
           </button>
         </div>
 
-        <div className="max-h-[420px] overflow-y-auto">
+        <div className="max-h-105 overflow-y-auto">
           {!query && (
             <div className="p-2">
               <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest px-3 py-2">Quick Actions</p>
@@ -140,10 +148,14 @@ function NotificationsDropdown({
   onClose,
   sessions,
   cvs,
+  notifications,
+  onMarkAllRead,
 }: {
-  onClose:  () => void;
-  sessions: Session[];
-  cvs:      CV[];
+  onClose:        () => void;
+  sessions:       Session[];
+  cvs:            CV[];
+  notifications:  Notification[];
+  onMarkAllRead:  () => void;
 }) {
   const router = useRouter();
   const ref    = useRef<HTMLDivElement>(null);
@@ -156,51 +168,119 @@ function NotificationsDropdown({
     return () => document.removeEventListener("mousedown", handler);
   }, [onClose]);
 
-  const items = [
-    ...sessions.slice(0, 4).map((s) => ({
-      icon:  <Mic2 size={13} className="text-amber-500" />,
-      bg:    "bg-amber-500/10 border-amber-500/20",
-      title: s.job_role,
-      sub:   s.status === "completed" ? `Completed · Score: ${s.score ?? "—"}` : "In Progress",
-      time:  timeAgo(s.created_at),
-      path:  s.status === "completed" ? `/dashboard/interviews/${s.id}` : "/dashboard/interviews",
+  const notifIcon = (type: Notification["type"]) => {
+    if (type === "payment")  return <CreditCard size={13} className="text-violet-400" />;
+    if (type === "interview") return <Mic2 size={13} className="text-amber-500" />;
+    if (type === "cv")        return <FileText size={13} className="text-emerald-500" />;
+    return <Info size={13} className="text-sky-400" />;
+  };
+  const notifBg = (type: Notification["type"]) => {
+    if (type === "payment")  return "bg-violet-500/10 border-violet-500/20";
+    if (type === "interview") return "bg-amber-500/10 border-amber-500/20";
+    if (type === "cv")        return "bg-emerald-500/10 border-emerald-500/20";
+    return "bg-sky-500/10 border-sky-500/20";
+  };
+
+  // Merge all sources into one timeline sorted newest-first
+  const allItems = [
+    ...notifications.map((n) => ({
+      id:         n.id,
+      icon:       notifIcon(n.type),
+      bg:         notifBg(n.type),
+      title:      n.title,
+      sub:        n.message ?? "",
+      time:       timeAgo(n.created_at),
+      created_at: n.created_at,
+      read:       n.read,
+      path:       n.type === "payment" ? "/dashboard/settings?tab=subscription"
+                : n.type === "cv"      ? "/dashboard/cv-builder"
+                : n.type === "interview" ? "/dashboard/interviews"
+                : null,
     })),
-    ...cvs.slice(0, 2).map((c) => ({
-      icon:  <FileText size={13} className="text-emerald-500" />,
-      bg:    "bg-emerald-500/10 border-emerald-500/20",
-      title: `CV — ${c.target_role || "General"}`,
-      sub:   "CV generated",
-      time:  timeAgo(c.created_at),
-      path:  "/dashboard/cv-builder",
+    ...sessions.map((s) => ({
+      id:         s.id,
+      icon:       <Mic2 size={13} className="text-amber-500" />,
+      bg:         "bg-amber-500/10 border-amber-500/20",
+      title:      s.job_role,
+      sub:        s.status === "completed" ? `Completed · Score: ${s.score ?? "—"}` : "In Progress",
+      time:       timeAgo(s.created_at),
+      created_at: s.created_at,
+      read:       true,
+      path:       s.status === "completed" ? `/dashboard/interviews/${s.id}` : "/dashboard/interviews",
     })),
-  ];
+    ...cvs.map((c) => ({
+      id:         c.id,
+      icon:       <FileText size={13} className="text-emerald-500" />,
+      bg:         "bg-emerald-500/10 border-emerald-500/20",
+      title:      `CV — ${c.target_role || "General"}`,
+      sub:        "CV generated",
+      time:       timeAgo(c.created_at),
+      created_at: c.created_at,
+      read:       true,
+      path:       "/dashboard/cv-builder",
+    })),
+  ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+  const unread = notifications.filter((n) => !n.read).length;
 
   return (
     <div ref={ref} className="absolute right-0 top-full mt-2 w-80 bg-zinc-900 border border-zinc-700 rounded-2xl shadow-2xl overflow-hidden z-50">
       <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800">
-        <span className="text-xs font-bold text-zinc-300 uppercase tracking-widest">Recent Activity</span>
-        <button onClick={onClose} className="text-zinc-600 hover:text-zinc-400 transition-colors"><X size={14} /></button>
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-bold text-zinc-300 uppercase tracking-widest">Notifications</span>
+          {unread > 0 && (
+            <span className="px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-400 text-[10px] font-bold">
+              {unread}
+            </span>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          {unread > 0 && (
+            <button
+              onClick={onMarkAllRead}
+              title="Mark all as read"
+              className="text-zinc-600 hover:text-amber-400 transition-colors"
+            >
+              <CheckCheck size={14} />
+            </button>
+          )}
+          <button onClick={onClose} className="text-zinc-600 hover:text-zinc-400 transition-colors">
+            <X size={14} />
+          </button>
+        </div>
       </div>
 
-      <div className="max-h-[360px] overflow-y-auto">
-        {items.length === 0 ? (
+      <div className="max-h-100 overflow-y-auto">
+        {allItems.length === 0 ? (
           <div className="text-center py-10">
             <Bell size={24} className="text-zinc-700 mx-auto mb-2" />
             <p className="text-zinc-600 text-xs">No activity yet.</p>
           </div>
         ) : (
           <div className="p-2 space-y-1">
-            {items.map((item, i) => (
-              <button key={i} onClick={() => { onClose(); router.push(item.path); }}
-                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-zinc-800 transition-colors text-left group">
+            {allItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => { if (item.path) { onClose(); router.push(item.path); } }}
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors text-left group ${
+                  item.path ? "hover:bg-zinc-800 cursor-pointer" : "cursor-default"
+                } ${!item.read ? "bg-zinc-800/40" : ""}`}
+              >
                 <div className={`w-7 h-7 rounded-lg border flex items-center justify-center shrink-0 ${item.bg}`}>
                   {item.icon}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-medium text-zinc-200 truncate">{item.title}</p>
-                  <p className="text-[11px] text-zinc-600">{item.sub}</p>
+                  <p className={`text-xs font-medium truncate ${!item.read ? "text-white" : "text-zinc-200"}`}>
+                    {item.title}
+                  </p>
+                  {item.sub && (
+                    <p className="text-[11px] text-zinc-600 truncate">{item.sub}</p>
+                  )}
                 </div>
-                <span className="text-[10px] text-zinc-700 shrink-0">{item.time}</span>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  {!item.read && <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />}
+                  <span className="text-[10px] text-zinc-700">{item.time}</span>
+                </div>
               </button>
             ))}
           </div>
@@ -209,11 +289,11 @@ function NotificationsDropdown({
 
       <div className="px-4 py-2.5 border-t border-zinc-800 flex items-center justify-between">
         <button onClick={() => { onClose(); router.push("/dashboard/interviews"); }}
-          className="text-[11px] text-amber-500 hover:text-amber-400 transition-colors font-medium">
+          className="text-[11px] text-amber-500 hover:text-amber-400 transition-colors font-medium cursor-pointer">
           View all interviews →
         </button>
         <button onClick={() => { onClose(); router.push("/dashboard/cv-builder"); }}
-          className="text-[11px] text-emerald-500 hover:text-emerald-400 transition-colors font-medium">
+          className="text-[11px] text-emerald-500 hover:text-emerald-400 transition-colors font-medium cursor-pointer">
           View all CVs →
         </button>
       </div>
@@ -229,9 +309,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [searchOpen,       setSearchOpen]       = useState(false);
   const [notifOpen,        setNotifOpen]        = useState(false);
 
-  // Fetched once on mount — shared by SearchModal and NotificationsDropdown
-  const [sessions, setSessions] = useState<Session[]>([]);
-  const [cvs,      setCVs]      = useState<CV[]>([]);
+  const [sessions,       setSessions]       = useState<Session[]>([]);
+  const [cvs,            setCVs]            = useState<CV[]>([]);
+  const [notifications,  setNotifications]  = useState<Notification[]>([]);
 
   const isSessionPage = pathname.includes("/session");
 
@@ -239,13 +319,40 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     Promise.all([
       fetch("/api/interviews").then((r) => r.json()),
       fetch("/api/generate-cv").then((r) => r.json()),
+      fetch("/api/notifications").then((r) => r.json()),
     ])
-      .then(([s, c]) => {
+      .then(([s, c, n]) => {
         setSessions(Array.isArray(s) ? s : []);
         setCVs(Array.isArray(c) ? c : []);
+        setNotifications(Array.isArray(n) ? n : []);
       })
       .catch(console.error);
   }, []);
+
+  const handleMarkAllRead = async () => {
+    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+    await fetch("/api/notifications", { method: "PATCH" }).catch(console.error);
+  };
+
+  const prevUnreadRef = useRef(0);
+  useEffect(() => {
+    const unread = notifications.filter((n) => !n.read).length;
+    if (unread > prevUnreadRef.current && localStorage.getItem("notif_sound") !== "false") {
+      try {
+        const ctx  = new AudioContext();
+        const osc  = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.value = 660;
+        gain.gain.setValueAtTime(0.08, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.25);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.25);
+      } catch { /* AudioContext not supported */ }
+    }
+    prevUnreadRef.current = unread;
+  }, [notifications]);
 
   // Ctrl/Cmd+K shortcut for search
   useEffect(() => {
@@ -258,6 +365,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, []);
+
+  const unreadCount = notifications.filter((n) => !n.read).length;
 
   return (
     <ThemeProvider forcedTheme="dark" attribute="class" disableTransitionOnChange>
@@ -313,8 +422,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     className="text-zinc-500 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-zinc-800 relative"
                   >
                     <Bell size={18} strokeWidth={1.5} />
-                    {(sessions.length > 0 || cvs.length > 0) && (
-                      <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-amber-500 rounded-full border border-black" />
+                    {unreadCount > 0 && (
+                      <span className="absolute -top-0.5 -right-0.5 min-w-4 h-4 px-1 bg-amber-500 rounded-full border border-black flex items-center justify-center text-[9px] font-bold text-black">
+                        {unreadCount > 9 ? "9+" : unreadCount}
+                      </span>
                     )}
                   </button>
                   {notifOpen && (
@@ -322,6 +433,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                       onClose={() => setNotifOpen(false)}
                       sessions={sessions}
                       cvs={cvs}
+                      notifications={notifications}
+                      onMarkAllRead={handleMarkAllRead}
                     />
                   )}
                 </div>
@@ -330,7 +443,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </header>
         )}
 
-        <main className={`flex-1 overflow-y-auto scroll-smooth bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-zinc-900/20 via-background to-background ${isSessionPage ? "p-0" : "p-6 lg:p-10"}`}>
+        <main className={`flex-1 overflow-y-auto scroll-smooth bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-zinc-900/20 via-background to-background ${isSessionPage ? "p-0" : "p-6 lg:p-10"}`}>
           <div className={isSessionPage ? "w-full h-full" : "max-w-7xl mx-auto"}>
             {children}
           </div>
