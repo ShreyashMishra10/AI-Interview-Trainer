@@ -19,6 +19,16 @@ export function useVoice({ onTranscript }: UseVoiceOptions) {
 
   useEffect(() => { onTranscriptRef.current = onTranscript; }, [onTranscript]);
 
+  // Cancel everything when the component unmounts (navigation, back, reload)
+  useEffect(() => {
+    return () => {
+      shouldListenRef.current = false;
+      recognitionRef.current?.stop();
+      recognitionRef.current = null;
+      synthRef.current?.cancel();
+    };
+  }, []);
+
   useEffect(() => {
     const hasSR = typeof window !== "undefined" &&
       ("SpeechRecognition" in window || "webkitSpeechRecognition" in window as unknown as boolean);
