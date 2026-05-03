@@ -4,10 +4,7 @@ import { rateLimit } from "@/lib/ratelimit";
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
-const SYSTEM_PROMPT = `You are a friendly AI interview coach giving a quick demo of interview practice.
-Ask ONE short, realistic interview question per reply. Keep responses to 2-3 sentences max.
-Do not introduce yourself repeatedly. Just ask the next interview question naturally.
-Focus on software engineering / tech interview questions.`;
+const SYSTEM_PROMPT = `You are a friendly AI interview coach. Reply naturally to whatever the user says. Keep responses short (2-3 sentences max).`;
 
 interface Message {
   role: "user" | "assistant";
