@@ -10,8 +10,6 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 export function ChatInterface() {
   const [message, setMessage] = useState([
     { role: "assistant", message: "Hi! I'm your AI interviewer. Which role are you targeting today?" },
-    { role: "user",      message: "I'm targeting a Frontend Developer role."                         },
-    { role: "assistant", message: "Great choice. Let's begin — what is the difference between `let`, `const`, and `var` in JavaScript?" },
   ]);
 
   const [input, setInput]               = useState("");
