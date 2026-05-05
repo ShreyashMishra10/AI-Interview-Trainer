@@ -46,7 +46,7 @@ function SettingsContent() {
   return (
     <div className="max-w-275 mx-auto animate-in fade-in duration-700">
       <div className="py-4 mb-8">
-        <h1 className="text-4xl font-serif text-white tracking-tight">Settings</h1>
+        <h1 className="text-4xl font-serif text-foreground tracking-tight">Settings</h1>
         <p className="text-zinc-600 mt-1 text-sm">Manage your account, preferences and subscription.</p>
       </div>
 
@@ -60,7 +60,7 @@ function SettingsContent() {
                 className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors text-left border cursor-pointer ${
                   activeTab === tab.id
                     ? "bg-amber-400/10 text-amber-400 border-amber-400/15"
-                    : "text-zinc-500 hover:text-zinc-300 hover:bg-zinc-900/50 border-transparent"
+                    : "text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-900/50 border-transparent"
                 }`}
               >
                 <span className={activeTab === tab.id ? "text-amber-400" : "text-zinc-600"}>{tab.icon}</span>

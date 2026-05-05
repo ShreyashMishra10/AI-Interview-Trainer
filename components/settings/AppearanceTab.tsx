@@ -135,13 +135,13 @@ export function AppearanceTab() {
                 className={`relative flex flex-col items-center gap-2 p-4 rounded-xl border transition-all cursor-pointer ${
                   t.id === "dark"
                     ? "border-amber-400/40 bg-amber-400/10 text-amber-400"
-                    : "border-zinc-800 text-zinc-700 opacity-40 cursor-not-allowed"
+                    : "border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-700 opacity-40 cursor-not-allowed"
                 }`}
               >
                 {t.icon}
                 <span className="text-xs font-semibold">{t.label}</span>
                 {!t.active && (
-                  <span className="absolute top-1.5 right-1.5 text-[8px] bg-zinc-800 text-zinc-500 px-1 rounded font-bold">SOON</span>
+                  <span className="absolute top-1.5 right-1.5 text-[8px] bg-zinc-200 dark:bg-zinc-800 text-zinc-500 px-1 rounded font-bold">SOON</span>
                 )}
               </button>
             ))}
@@ -179,7 +179,7 @@ export function AppearanceTab() {
           <select
             value={font}
             onChange={(e) => handleFont(e.target.value)}
-            className="bg-[#0d0d16] border border-zinc-800 rounded-lg px-3 py-1.5 text-xs text-zinc-300 outline-none cursor-pointer"
+            className="bg-zinc-100 dark:bg-[#0d0d16] border border-zinc-200 dark:border-zinc-800 rounded-lg px-3 py-1.5 text-xs text-zinc-700 dark:text-zinc-300 outline-none cursor-pointer"
           >
             <option value="small">Small</option>
             <option value="default">Default</option>
@@ -202,7 +202,7 @@ export function AppearanceTab() {
             <select
               disabled
               value={language}
-              className="bg-[#0d0d16] border border-zinc-800 rounded-lg px-3 py-1.5 text-xs text-zinc-300 outline-none cursor-not-allowed"
+              className="bg-zinc-100 dark:bg-[#0d0d16] border border-zinc-200 dark:border-zinc-800 rounded-lg px-3 py-1.5 text-xs text-zinc-500 dark:text-zinc-300 outline-none cursor-not-allowed"
             >
               {LANGUAGES.map((l) => (
                 <option key={l.code} value={l.label}>{l.label}</option>
@@ -215,7 +215,7 @@ export function AppearanceTab() {
           <select
             value={timezone}
             onChange={(e) => handleTimezone(e.target.value)}
-            className="bg-[#0d0d16] border border-zinc-800 rounded-lg px-3 py-1.5 text-xs text-zinc-300 outline-none cursor-pointer"
+            className="bg-zinc-100 dark:bg-[#0d0d16] border border-zinc-200 dark:border-zinc-800 rounded-lg px-3 py-1.5 text-xs text-zinc-700 dark:text-zinc-300 outline-none cursor-pointer"
           >
             <option>IST (UTC+5:30)</option>
             <option>JST (UTC+9:00)</option>

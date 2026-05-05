@@ -17,8 +17,8 @@
     display: none;
   }
   .no-scrollbar {
-    -ms-overflow-style: none; 
-    scrollbar-width: none; 
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }
 @keyframes fadeInUp {
@@ -38,7 +38,7 @@
 }
 
 .animate-reveal {
-  opacity: 0; /* Keeps it hidden before animation starts */
+  opacity: 0;
   animation: fadeInUp 0.8s ease-out forwards;
 }
 
@@ -88,29 +88,33 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+  /* Dashboard gold tokens */
+  --color-gold-muted: #b8912e;
+  --color-gold-bright: #f5d17a;
+  --color-gold-accent: #b8912e;
 }
 
 :root {
   /* DARKER GREY: Dropped from 0.97 to 0.92 for more depth */
-  --background: oklch(0.92 0 0); 
+  --background: oklch(0.92 0 0);
   --foreground: oklch(0.145 0 0);
-  
+
   /* STILL PURE WHITE: This creates the "Premium" contrast */
-  --card: oklch(0.92 0 0); 
+  --card: oklch(0.92 0 0);
   --card-foreground: oklch(0.145 0 0);
-  
+
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
   --primary: oklch(0.205 0 0);
   --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.85 0 0); /* Slightly darker secondary to match */
+  --secondary: oklch(0.85 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.90 0 0);
-  --muted-foreground: oklch(0.45 0 0); /* Darkened for better contrast on grey */
+  --muted-foreground: oklch(0.45 0 0);
   --accent: oklch(0.88 0 0);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.85 0 0); /* Visible borders for that "Architect" feel */
+  --border: oklch(0.85 0 0);
   --input: oklch(0.85 0 0);
   --ring: oklch(0.6 0 0);
   --chart-1: oklch(0.87 0 0);
@@ -127,6 +131,9 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.88 0 0);
   --sidebar-ring: oklch(0.6 0 0);
+  /* Dashboard glass card — light mode */
+  --color-card-bg: rgba(255, 255, 255, 0.9);
+  --color-card-border: rgba(212, 212, 216, 0.5);
 }
 
 .dark {
@@ -162,6 +169,9 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+  /* Dashboard glass card — dark mode (original values) */
+  --color-card-bg: rgba(24, 24, 27, 0.4);
+  --color-card-border: rgba(39, 39, 39, 0.5);
 }
 
 @layer base {
@@ -170,11 +180,81 @@
   }
   body {
     @apply bg-background text-foreground transition-colors duration-300;
+    letter-spacing: -0.01em;
   }
   html {
     @apply font-sans;
   }
 }
+
 .no-scrollbar::-webkit-scrollbar {
   display: none !important;
 }
+
+/* ── Dashboard utilities ───────────────────────────────────── */
+
+@utility dashboard-card {
+  background-color: var(--color-card-bg);
+  border: 1px solid var(--color-card-border);
+  border-radius: 0.75rem;
+  backdrop-filter: blur(12px);
+  transition: all 0.3s ease;
+}
+
+@utility gold-gradient-text {
+  background: linear-gradient(to right, #b8912e, #f5d17a, #b8912e);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@utility ready-badge {
+  background-color: rgba(184, 145, 46, 0.1);
+  border: 1px solid rgba(184, 145, 46, 0.3);
+  color: #f5d17a;
+  padding: 0.25rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+@utility heatmap-cell {
+  width: 14px;
+  height: 14px;
+  border-radius: 2px;
+  background-color: rgba(39, 39, 42, 0.4);
+  border: 1px solid rgba(63, 63, 70, 0.3);
+  transition: all 0.2s ease;
+}
+
+@utility heatmap-active {
+  background-color: var(--color-gold-muted);
+  box-shadow: 0 0 8px rgba(184, 145, 46, 0.2);
+}
+
+/* ── Appearance settings ───────────────────────────────────── */
+
+html.font-small { font-size: 13px; }
+html.font-large  { font-size: 17px; }
+
+html.no-animations *,
+html.no-animations *::before,
+html.no-animations *::after {
+  animation-duration:        0.01ms !important;
+  animation-iteration-count: 1      !important;
+  transition-duration:       0.01ms !important;
+}
+
+html.compact .p-5  { padding: 0.75rem !important; }
+html.compact .p-6  { padding: 1rem    !important; }
+html.compact .py-6 { padding-top: 0.75rem !important; padding-bottom: 0.75rem !important; }
+html.compact .space-y-1\.5 > * + * { margin-top: 0.125rem !important; }
+html.compact .space-y-2   > * + * { margin-top: 0.25rem  !important; }
+html.compact .gap-3 { gap: 0.375rem !important; }
+
+/* ── Scrollbar ─────────────────────────────────────────────── */
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #27272a; border-radius: 10px; }

@@ -4,8 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { Sidebar } from "@/components/sidebar";
 import { Search, Bell, Menu, X, Mic2, FileText, Clock, ChevronRight, CreditCard, Info, CheckCheck } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
-import { ThemeProvider } from "@/components/ui/theme-provider";
-import "./global.css";
+import { ModeToggle } from "@/components/theme-toggle";
 
 /* ── Types ─────────────────────────────────────────────────── */
 interface Session {
@@ -369,7 +368,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   return (
-    <ThemeProvider forcedTheme="dark" attribute="class" disableTransitionOnChange>
     <div className="flex h-screen bg-background overflow-hidden selection:bg-gold-accent/30">
       {!isSessionPage && (
         <Sidebar
@@ -382,30 +380,31 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {!isSessionPage && (
-          <header className="h-16 border-b border-zinc-800/50 flex items-center justify-between px-6 lg:px-8 bg-black/20 backdrop-blur-xl sticky top-0 z-40">
+          <header className="h-16 border-b border-zinc-200 dark:border-zinc-800/50 flex items-center justify-between px-6 lg:px-8 bg-zinc-200 dark:bg-black/20 backdrop-blur-xl shadow-sm dark:shadow-none sticky top-0 z-40">
 
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setSidebarOpen(true)}
                 aria-label="Open menu"
-                className="md:hidden text-zinc-500 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-zinc-800"
+                className="md:hidden text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors p-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800"
               >
                 <Menu size={20} />
               </button>
             </div>
 
             <div className="flex items-center gap-6">
-              <div className="hidden sm:flex items-center gap-2.5 px-3 py-1.5 bg-zinc-900/40 border border-zinc-800/50 rounded-full">
+              <div className="hidden sm:flex items-center gap-2.5 px-3 py-1.5 bg-zinc-100 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800/50 rounded-full">
                 <div className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75" />
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
                 </div>
-                <span className="text-[10px] text-zinc-400 font-semibold uppercase tracking-wider">
+                <span className="text-[10px] text-zinc-500 dark:text-zinc-400 font-semibold uppercase tracking-wider">
                   AI Engine: Online
                 </span>
               </div>
 
-              <div className="flex items-center gap-3 border-l border-zinc-800 pl-6">
+              <div className="flex items-center gap-3 border-l border-zinc-200 dark:border-zinc-800 pl-6">
+                <ModeToggle />
                 <button
                   onClick={() => setSearchOpen(true)}
                   aria-label="Search"
@@ -443,7 +442,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </header>
         )}
 
-        <main className={`flex-1 overflow-y-auto scroll-smooth bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-zinc-900/20 via-background to-background ${isSessionPage ? "p-0" : "p-6 lg:p-10"}`}>
+        <main className={`flex-1 overflow-y-auto scroll-smooth bg-background ${isSessionPage ? "p-0" : "p-6 lg:p-10"}`}>
           <div className={isSessionPage ? "w-full h-full" : "max-w-7xl mx-auto"}>
             {children}
           </div>
@@ -457,6 +456,5 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         />
       )}
     </div>
-    </ThemeProvider>
   );
 }

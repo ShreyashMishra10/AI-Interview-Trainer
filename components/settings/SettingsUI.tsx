@@ -25,7 +25,7 @@ export function Toggle({ enabled, onChange }: ToggleProps) {
       onClick={() => onChange(!enabled)}
       style={{ height: "22px", width: "40px" }}
       className={`relative rounded-full transition-all duration-300 flex items-center ${
-        enabled ? "bg-amber-400" : "bg-zinc-700"
+        enabled ? "bg-amber-400" : "bg-zinc-300 dark:bg-zinc-700"
       }`}
     >
       <div
@@ -41,10 +41,10 @@ export function SettingSection({ title, description, children }: SettingSectionP
   return (
     <div className="mb-8">
       <div className="mb-4">
-        <h3 className="text-sm font-semibold text-zinc-200">{title}</h3>
-        {description && <p className="text-xs text-zinc-600 mt-0.5">{description}</p>}
+        <h3 className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">{title}</h3>
+        {description && <p className="text-xs text-zinc-500 dark:text-zinc-600 mt-0.5">{description}</p>}
       </div>
-      <div className="bg-[#08080e] border border-zinc-800/60 rounded-2xl divide-y divide-zinc-800/50">
+      <div className="bg-white dark:bg-[#08080e] border border-zinc-200 dark:border-zinc-800/60 rounded-2xl divide-y divide-zinc-100 dark:divide-zinc-800/50">
         {children}
       </div>
     </div>
@@ -55,9 +55,9 @@ export function SettingRow({ label, description, children }: SettingRowProps) {
   return (
     <div className="flex items-center justify-between px-5 py-4 gap-4">
       <div className="min-w-0">
-        <p className="text-sm text-zinc-300 font-medium">{label}</p>
+        <p className="text-sm text-zinc-700 dark:text-zinc-300 font-medium">{label}</p>
         {description && (
-          <p className="text-xs text-zinc-600 mt-0.5 leading-relaxed">{description}</p>
+          <p className="text-xs text-zinc-500 dark:text-zinc-600 mt-0.5 leading-relaxed">{description}</p>
         )}
       </div>
       <div className="shrink-0">{children}</div>

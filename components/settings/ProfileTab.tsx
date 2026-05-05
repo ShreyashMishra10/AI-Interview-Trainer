@@ -120,7 +120,7 @@ export function ProfileTab() {
             {avatarUrl ? (
               <img src={avatarUrl} alt="Avatar" className="w-20 h-20 rounded-full object-cover border border-amber-400/20" />
             ) : (
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-amber-400/30 to-amber-600/30 border border-amber-400/20 flex items-center justify-center text-2xl font-bold text-amber-400">
+              <div className="w-20 h-20 rounded-full bg-linear-to-br from-amber-400/30 to-amber-600/30 border border-amber-400/20 flex items-center justify-center text-2xl font-bold text-amber-400">
                 {initials}
               </div>
             )}
@@ -129,7 +129,7 @@ export function ProfileTab() {
             </div>
           </div>
           <div>
-            <p className="text-sm font-medium text-zinc-300">Upload new photo</p>
+            <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Upload new photo</p>
             <p className="text-xs text-zinc-600 mt-1">JPG, PNG or GIF · Max 2MB</p>
             <button
               onClick={() => !uploading && fileRef.current?.click()}
@@ -150,7 +150,7 @@ export function ProfileTab() {
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full bg-[#0d0d16] border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-zinc-200 outline-none focus:border-amber-400/40 transition-colors cursor-text"
+              className="w-full bg-zinc-100 dark:bg-[#0d0d16] border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-zinc-800 dark:text-zinc-200 outline-none focus:border-amber-400/40 transition-colors cursor-text"
             />
           </div>
           <div>
@@ -160,7 +160,7 @@ export function ProfileTab() {
               onChange={(e) => setBio(e.target.value)}
               rows={3}
               placeholder="Tell us about yourself..."
-              className="w-full bg-[#0d0d16] border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-zinc-200 outline-none focus:border-amber-400/40 transition-colors resize-none cursor-text"
+              className="w-full bg-zinc-100 dark:bg-[#0d0d16] border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-zinc-800 dark:text-zinc-200 outline-none focus:border-amber-400/40 transition-colors resize-none cursor-text"
             />
           </div>
           <div>
@@ -168,7 +168,7 @@ export function ProfileTab() {
             <input
               value={email}
               disabled
-              className="w-full bg-[#0d0d16] border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-zinc-500 outline-none cursor-not-allowed"
+              className="w-full bg-zinc-100 dark:bg-[#0d0d16] border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-zinc-500 outline-none cursor-not-allowed"
             />
             <p className="text-[10px] text-zinc-700 mt-1">Email is managed by Clerk authentication.</p>
           </div>
@@ -180,7 +180,7 @@ export function ProfileTab() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="text-[11px] text-zinc-600 font-bold uppercase tracking-widest block mb-2">Target Role</label>
-              <select value={targetRole} onChange={(e) => setTargetRole(e.target.value)} className="w-full bg-[#0d0d16] border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-zinc-200 outline-none focus:border-amber-400/40 transition-colors appearance-none cursor-pointer">
+              <select value={targetRole} onChange={(e) => setTargetRole(e.target.value)} className="w-full bg-zinc-100 dark:bg-[#0d0d16] border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-zinc-800 dark:text-zinc-200 outline-none focus:border-amber-400/40 transition-colors appearance-none cursor-pointer">
                 <option>Full-Stack Developer</option>
                 <option>Frontend Developer</option>
                 <option>Backend Developer</option>
@@ -191,7 +191,7 @@ export function ProfileTab() {
             </div>
             <div>
               <label className="text-[11px] text-zinc-600 font-bold uppercase tracking-widest block mb-2">Experience Level</label>
-              <select value={experience} onChange={(e) => setExperience(e.target.value)} className="w-full bg-[#0d0d16] border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-zinc-200 outline-none focus:border-amber-400/40 transition-colors appearance-none cursor-pointer">
+              <select value={experience} onChange={(e) => setExperience(e.target.value)} className="w-full bg-zinc-100 dark:bg-[#0d0d16] border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-zinc-800 dark:text-zinc-200 outline-none focus:border-amber-400/40 transition-colors appearance-none cursor-pointer">
                 <option>Fresher (0–1 yr)</option>
                 <option>Junior (1–3 yrs)</option>
                 <option>Mid (3–5 yrs)</option>
@@ -210,7 +210,7 @@ export function ProfileTab() {
             ? "bg-emerald-500/15 border border-emerald-500/30 text-emerald-400"
             : isDirty
               ? "bg-amber-400/15 border border-amber-400/25 text-amber-400 hover:bg-amber-400/20 cursor-pointer"
-              : "bg-zinc-800/40 border border-zinc-800 text-zinc-600 cursor-not-allowed"
+              : "bg-zinc-100 dark:bg-zinc-800/40 border border-zinc-200 dark:border-zinc-800 text-zinc-400 dark:text-zinc-600 cursor-not-allowed"
         }`}
       >
         {saving ? <><Loader2 size={15} className="animate-spin" /> Saving...</>

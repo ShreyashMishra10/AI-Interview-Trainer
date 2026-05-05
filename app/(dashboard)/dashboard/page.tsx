@@ -140,10 +140,10 @@ function ActivityHeatmap({ interviewDates }: { interviewDates: Set<string> }) {
                     const isActive = hasInterview && inYear && !isFuture;
 
                     let cellClass = "";
-                    if (!inYear)       cellClass = "bg-zinc-900/20";
-                    else if (isFuture) cellClass = "bg-zinc-800/30";
+                    if (!inYear)       cellClass = "bg-zinc-200/40 dark:bg-zinc-900/20";
+                    else if (isFuture) cellClass = "bg-zinc-200/60 dark:bg-zinc-800/30";
                     else if (isActive) cellClass = "bg-amber-400/85 cursor-pointer";
-                    else               cellClass = "bg-zinc-800/70 hover:bg-zinc-700/70";
+                    else               cellClass = "bg-zinc-300/70 dark:bg-zinc-800/70 hover:bg-zinc-400/70 dark:hover:bg-zinc-700/70";
 
                     return (
                       <div key={dateStr}
@@ -164,7 +164,7 @@ function ActivityHeatmap({ interviewDates }: { interviewDates: Set<string> }) {
 
           <div className="flex items-center gap-2 mt-3 ml-8">
             <span className="text-[10px] text-zinc-700">No interview</span>
-            <div style={{ width: CELL, height: CELL }} className="rounded-xs bg-zinc-800/70" />
+            <div style={{ width: CELL, height: CELL }} className="rounded-xs bg-zinc-300/70 dark:bg-zinc-800/70" />
             <div style={{ width: CELL, height: CELL }} className="rounded-xs bg-amber-400/40" />
             <div style={{ width: CELL, height: CELL, boxShadow: "0 0 6px var(--accent-glow2)" }} className="rounded-xs bg-amber-400/85" />
             <span className="text-[10px] text-zinc-700">Interview done</span>
@@ -218,7 +218,7 @@ export default function DashboardPage() {
     return (
       <div className="flex items-center justify-center h-[60vh]">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-12 h-12 rounded-full border-[3px] border-zinc-700 border-t-amber-400 animate-spin" />
+          <div className="w-12 h-12 rounded-full border-[3px] border-zinc-300 dark:border-zinc-700 border-t-amber-400 animate-spin" />
           <p className="text-zinc-600 text-xs uppercase tracking-widest font-medium">Loading dashboard…</p>
         </div>
       </div>
@@ -231,7 +231,7 @@ export default function DashboardPage() {
       {/* Header */}
       <section className="py-4 flex items-start justify-between flex-wrap gap-4">
         <div>
-          <h1 className="text-5xl font-serif text-white tracking-tight">
+          <h1 className="text-5xl font-serif text-foreground tracking-tight">
             Welcome back, <span className="text-amber-400/90">{firstName}.</span>
           </h1>
           <p className="text-zinc-600 mt-2 text-sm font-medium tracking-wide">
@@ -244,9 +244,9 @@ export default function DashboardPage() {
         {/* Plan badge + credits */}
         {profile && (
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900/60 border border-zinc-800 rounded-full">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-100 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 rounded-full">
               {getPlanIcon(profile.plan)}
-              <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
                 {profile.plan} plan
               </span>
             </div>
@@ -266,14 +266,14 @@ export default function DashboardPage() {
 
           {/* Performance Gauge */}
           <section className="min-h-[440px] flex flex-col items-center justify-center relative overflow-hidden
-            bg-[#08080e] border border-zinc-800/60 rounded-3xl shadow-2xl
+            bg-white dark:bg-[#08080e] border border-zinc-200 dark:border-zinc-800/60 rounded-3xl shadow-2xl
             before:absolute before:inset-0 before:bg-[radial-gradient(ellipse_at_top,rgba(251,191,36,0.04),transparent_60%)]">
-            <h3 className="absolute top-8 left-8 text-zinc-600 text-[10px] font-bold uppercase tracking-[0.3em]">
+            <h3 className="absolute top-8 left-8 text-amber-500/70 dark:text-zinc-600 text-[10px] font-bold uppercase tracking-[0.3em]">
               Performance Pulse
             </h3>
             <div className="absolute top-0 right-0 w-32 h-32 bg-amber-400/3 rounded-bl-full blur-2xl" />
             <div className="text-center space-y-2 relative z-10">
-              <h2 className="text-zinc-500 text-sm font-medium uppercase tracking-widest mb-6">
+              <h2 className="text-zinc-400 dark:text-zinc-500 text-sm font-medium uppercase tracking-widest mb-6">
                 Interview Readiness Score
               </h2>
               <PerformanceGauge percentage={readiness} />
@@ -289,15 +289,14 @@ export default function DashboardPage() {
           </section>
 
           {/* Activity Heatmap */}
-          <section className="p-8 bg-[#08080e] border border-zinc-800/60 rounded-3xl shadow-xl
-            before:absolute before:inset-0 before:bg-[radial-gradient(ellipse_at_bottom_left,rgba(251,191,36,0.03),transparent_70%)]
+          <section className="p-8 bg-white dark:bg-[#08080e] border border-zinc-200 dark:border-zinc-800/60 rounded-3xl shadow-xl
             relative overflow-hidden">
             <div className="flex justify-between items-center mb-8">
               <div>
-                <h3 className="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.3em]">
+                <h3 className="text-amber-500/70 dark:text-zinc-500 text-[10px] font-bold uppercase tracking-[0.3em]">
                   Annual Commitment
                 </h3>
-                <p className="text-zinc-700 text-xs mt-1">
+                <p className="text-zinc-600 text-xs mt-1">
                   Interview activity — glows on completed sessions
                 </p>
               </div>
@@ -326,16 +325,16 @@ export default function DashboardPage() {
             />
           </div>
 
-          {/* Recent Sessions / Feedback Feed */}
+          {/* Recent Sessions */}
           <section className="h-[460px] p-8 flex flex-col
-            bg-[#08080e] border border-zinc-800/60 rounded-3xl relative overflow-hidden
+            bg-white dark:bg-[#08080e] border border-zinc-200 dark:border-zinc-800/60 rounded-3xl relative overflow-hidden
             before:absolute before:inset-0 before:pointer-events-none before:bg-[radial-gradient(ellipse_at_top_right,rgba(251,191,36,0.03),transparent_60%)]">
             <div className="flex items-center justify-between mb-8">
-              <h3 className="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.3em]">
+              <h3 className="text-amber-500/70 dark:text-zinc-500 text-[10px] font-bold uppercase tracking-[0.3em]">
                 Recent Sessions
               </h3>
               <Link href="/dashboard/interviews"
-                className="px-3 py-1.5 rounded-lg border border-zinc-800 hover:border-amber-500/40 hover:text-amber-400 text-zinc-500 text-[10px] font-semibold uppercase tracking-widest transition-all">
+                className="px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 hover:border-amber-500/40 hover:text-amber-400 text-zinc-500 text-[10px] font-semibold uppercase tracking-widest transition-all">
                 View all →
               </Link>
             </div>
@@ -343,7 +342,7 @@ export default function DashboardPage() {
             <div className="flex-1 overflow-y-auto pr-2 flex flex-col gap-3 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-zinc-800">
               {recentDone.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full gap-3 text-center">
-                  <Mic2 size={24} className="text-zinc-700" />
+                  <Mic2 size={24} className="text-zinc-400 dark:text-zinc-700" />
                   <p className="text-zinc-600 text-xs font-medium">No sessions yet.</p>
                   <Link href="/dashboard/interviews"
                     className="text-[10px] text-amber-500 hover:text-amber-400 font-bold uppercase tracking-widest transition-colors">
@@ -353,9 +352,9 @@ export default function DashboardPage() {
               ) : (
                 recentDone.map((s) => (
                   <Link key={s.id} href={`/dashboard/interviews/${s.id}`}>
-                    <div className="p-4 rounded-xl border border-zinc-800/60 bg-zinc-900/40 hover:border-amber-500/20 hover:bg-zinc-900/70 transition-all duration-200 cursor-pointer group">
+                    <div className="p-4 rounded-xl border border-zinc-200 dark:border-zinc-800/60 bg-zinc-50 dark:bg-zinc-900/40 hover:border-amber-500/20 hover:bg-zinc-100 dark:hover:bg-zinc-900/70 transition-all duration-200 cursor-pointer group">
                       <div className="flex items-center justify-between mb-1">
-                        <p className="text-xs font-semibold text-zinc-200 truncate group-hover:text-white transition-colors">{s.job_role}</p>
+                        <p className="text-xs font-semibold text-zinc-700 dark:text-zinc-200 truncate group-hover:text-zinc-900 dark:group-hover:text-white transition-colors">{s.job_role}</p>
                         {s.score !== null ? (
                           <span className={`text-[11px] font-bold ml-2 shrink-0 ${s.score >= 70 ? "text-emerald-400" : "text-red-400"}`}>
                             {s.score}/100
@@ -374,7 +373,7 @@ export default function DashboardPage() {
             </div>
 
             <div className="absolute bottom-0 left-0 right-0 h-16
-              bg-gradient-to-t from-[#08080e] to-transparent pointer-events-none" />
+              bg-gradient-to-t from-white dark:from-[#08080e] to-transparent pointer-events-none" />
           </section>
         </div>
       </div>
@@ -388,26 +387,26 @@ function ActionCard({ title, icon, subtitle, href }: ActionCardProps) {
   return (
     <Link href={href}>
       <div className="p-6 group cursor-pointer transition-all duration-300
-        bg-[#08080e] border border-zinc-800/60 rounded-2xl
-        hover:border-amber-400/30 hover:bg-[#0d0d16]
+        bg-white dark:bg-[#08080e] border border-zinc-200 dark:border-zinc-800/60 rounded-2xl
+        hover:border-amber-400/30 hover:bg-zinc-50 dark:hover:bg-[#0d0d16]
         hover:shadow-[0_0_30px_rgba(251,191,36,0.06)]
         relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(251,191,36,0.04),transparent_70%)]
           opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         <div className="flex justify-between items-start mb-6 relative z-10">
-          <span className="text-zinc-600 group-hover:text-amber-400/80 transition-colors duration-300
-            p-2 bg-zinc-900/80 rounded-lg border border-zinc-800/60 group-hover:border-amber-400/20">
+          <span className="text-zinc-500 dark:text-zinc-600 group-hover:text-amber-400/80 transition-colors duration-300
+            p-2 bg-zinc-100 dark:bg-zinc-900/80 rounded-lg border border-zinc-200 dark:border-zinc-800/60 group-hover:border-amber-400/20">
             {icon}
           </span>
-          <ArrowUpRight size={14} className="text-zinc-700 group-hover:text-amber-400/70 transition-all duration-300
+          <ArrowUpRight size={14} className="text-zinc-400 dark:text-zinc-700 group-hover:text-amber-400/70 transition-all duration-300
             transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
         </div>
-        <p className="text-xs font-bold text-zinc-300 tracking-tight leading-tight relative z-10
-          group-hover:text-zinc-200 transition-colors">
+        <p className="text-xs font-bold text-zinc-700 dark:text-zinc-300 tracking-tight leading-tight relative z-10
+          group-hover:text-zinc-900 dark:group-hover:text-zinc-200 transition-colors">
           {title}
         </p>
         {subtitle && (
-          <p className="text-[9px] text-zinc-600 font-semibold mt-2 uppercase tracking-widest relative z-10
+          <p className="text-[9px] text-zinc-500 dark:text-zinc-600 font-semibold mt-2 uppercase tracking-widest relative z-10
             group-hover:text-amber-500/50 transition-colors">
             {subtitle}
           </p>
@@ -416,4 +415,3 @@ function ActionCard({ title, icon, subtitle, href }: ActionCardProps) {
     </Link>
   );
 }
-

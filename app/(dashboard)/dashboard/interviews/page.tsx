@@ -41,7 +41,7 @@ function SessionCard({ session, onClick }: { session: Session; onClick: () => vo
   return (
     <div
       onClick={onClick}
-      className="bg-[#171721] border border-[#272731] rounded-[14px] p-[18px_20px] flex items-center gap-4 cursor-pointer transition-all hover:border-[#373741] hover:bg-[#1D1D28] hover:-translate-y-[1px]"
+      className="bg-white dark:bg-[#171721] border border-zinc-200 dark:border-[#272731] rounded-[14px] p-[18px_20px] flex items-center gap-4 cursor-pointer transition-all hover:border-zinc-300 dark:hover:border-[#373741] hover:bg-zinc-50 dark:hover:bg-[#1D1D28] hover:-translate-y-px"
     >
       {/* Icon */}
       <div className="w-11 h-11 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">
@@ -50,7 +50,7 @@ function SessionCard({ session, onClick }: { session: Session; onClick: () => vo
 
       {/* Info */}
       <div className="flex-1 min-w-0">
-        <div className="text-[15px] font-medium mb-1 text-white truncate">{session.job_role}</div>
+        <div className="text-[15px] font-medium mb-1 text-zinc-900 dark:text-white truncate">{session.job_role}</div>
         <div className="text-[12px] text-[#7A7A9A] flex items-center gap-3 flex-wrap">
           <span>{timeAgo(session.created_at)}</span>
           <span className="w-[3px] h-[3px] rounded-full bg-[#4A4A6A]" />
@@ -95,13 +95,13 @@ function ResumeDiscardModal({ session, onResume, onDiscard, onClose }: {
 }) {
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-[#12121a] border border-[#272731] rounded-2xl w-full max-w-md p-7 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-white dark:bg-[#12121a] border border-zinc-200 dark:border-[#272731] rounded-2xl w-full max-w-md p-7 shadow-2xl" onClick={(e) => e.stopPropagation()}>
         <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mb-4">
           <Mic2 size={18} className="text-amber-500" />
         </div>
-        <h2 className="text-lg font-bold text-white mb-1">Session in progress</h2>
+        <h2 className="text-lg font-bold text-zinc-900 dark:text-white mb-1">Session in progress</h2>
         <p className="text-sm text-zinc-500 mb-1 font-medium">{session.job_role}</p>
-        <p className="text-sm text-zinc-600 mb-6">This session was never finished. Do you want to resume it or discard it?</p>
+        <p className="text-sm text-zinc-500 dark:text-zinc-600 mb-6">This session was never finished. Do you want to resume it or discard it?</p>
         <div className="flex gap-3">
           <button onClick={onResume}
             className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black text-sm font-semibold transition-all">
@@ -112,7 +112,7 @@ function ResumeDiscardModal({ session, onResume, onDiscard, onClose }: {
             <Trash2 size={14} /> Discard
           </button>
         </div>
-        <button onClick={onClose} className="w-full mt-3 text-xs text-zinc-600 hover:text-zinc-400 transition-colors">Cancel</button>
+        <button onClick={onClose} className="w-full mt-3 text-xs text-zinc-500 dark:text-zinc-600 hover:text-zinc-400 transition-colors">Cancel</button>
       </div>
     </div>
   );
@@ -152,7 +152,7 @@ export default function InterviewsPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-7">
         <div>
-          <h1 className="text-[26px] font-bold tracking-tight text-white">Interview sessions</h1>
+          <h1 className="text-[26px] font-bold tracking-tight text-zinc-900 dark:text-white">Interview sessions</h1>
           <p className="text-[#7A7A9A] text-[14px] mt-1">All your practice sessions — review, retake, or start fresh.</p>
         </div>
         <button
@@ -173,7 +173,7 @@ export default function InterviewsPage() {
             className={`px-4 py-1.5 rounded-full text-[13px] border transition-all ${
               filter === f
                 ? "border-amber-500/50 text-amber-400 bg-amber-500/10"
-                : "border-[#272731] bg-transparent text-[#7A7A9A] hover:border-amber-500/30 hover:text-amber-400/70"
+                : "border-zinc-200 dark:border-[#272731] bg-transparent text-[#7A7A9A] hover:border-amber-500/30 hover:text-amber-400/70"
             }`}
           >
             {f}
@@ -191,7 +191,7 @@ export default function InterviewsPage() {
           <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
             <Mic2 size={24} className="text-amber-500" />
           </div>
-          <p className="text-white font-semibold">No sessions yet</p>
+          <p className="text-zinc-900 dark:text-white font-semibold">No sessions yet</p>
           <p className="text-[#7A7A9A] text-sm max-w-xs">
             {filter !== "All" ? `No ${filter} sessions found.` : "Start your first mock interview to begin tracking progress."}
           </p>

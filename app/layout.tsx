@@ -75,9 +75,9 @@ export default function RootLayout({
           <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ORG_JSONLD) }} />
         </head>
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen w-full flex flex-col`}>
-          <ThemeProvider 
+          <ThemeProvider
             attribute="class"
-            defaultTheme="system"
+            defaultTheme="dark"
             enableSystem
             disableTransitionOnChange
             >

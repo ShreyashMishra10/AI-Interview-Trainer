@@ -92,10 +92,10 @@ export function SubscriptionTab() {
       {/* Current Plan */}
       <SettingSection title="Current Plan">
         <div className="p-5">
-          <div className="flex items-start justify-between p-5 bg-[#0d0d16] rounded-xl border border-amber-400/20 mb-4">
+          <div className="flex items-start justify-between p-5 bg-zinc-50 dark:bg-[#0d0d16] rounded-xl border border-amber-400/20 mb-4">
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <span className="text-base font-bold text-white capitalize">{plan} Plan</span>
+                <span className="text-base font-bold text-zinc-900 dark:text-white capitalize">{plan} Plan</span>
                 <span className="text-[9px] bg-amber-400/15 text-amber-400 border border-amber-400/20 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Active</span>
               </div>
               <p className="text-xs text-zinc-600">
@@ -131,7 +131,7 @@ export function SubscriptionTab() {
                         : `${u.used} / ${u.total} used${u.remaining !== undefined ? ` · ${u.remaining} left` : ""}`}
                     </span>
                   </div>
-                  <div className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                  <div className="h-1.5 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
                     {u.total === Infinity ? (
                       <div className="h-full w-full rounded-full bg-amber-400/20" />
                     ) : (
@@ -159,7 +159,7 @@ export function SubscriptionTab() {
                 className={`flex flex-col p-5 rounded-xl border transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl group ${
                   p.highlight
                     ? "border-amber-400/30 bg-amber-400/5 hover:border-amber-400/60 hover:shadow-amber-500/10"
-                    : "border-zinc-800 bg-[#0d0d16] hover:border-zinc-600 hover:shadow-black/30"
+                    : "border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-[#0d0d16] hover:border-zinc-300 dark:hover:border-zinc-600 hover:shadow-black/10 dark:hover:shadow-black/30"
                 }`}
               >
                 {p.highlight && (
@@ -168,10 +168,10 @@ export function SubscriptionTab() {
                   </div>
                 )}
                 <div className="flex items-baseline gap-1 mb-1">
-                  <span className="text-xl font-bold text-white">{p.price}</span>
+                  <span className="text-xl font-bold text-zinc-900 dark:text-white">{p.price}</span>
                   <span className="text-xs text-zinc-600">{p.period}</span>
                 </div>
-                <p className="text-sm font-semibold text-zinc-300 mb-4 flex items-center gap-1.5">
+                <p className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-4 flex items-center gap-1.5">
                   {p.icon} {p.name}
                 </p>
                 <ul className="space-y-2 mb-5 flex-1">
@@ -185,7 +185,7 @@ export function SubscriptionTab() {
                   className={`w-full py-2.5 rounded-xl text-xs font-bold text-center transition-all mt-auto ${
                     p.highlight
                       ? "bg-amber-500 group-hover:bg-amber-400 text-black"
-                      : "border border-zinc-700 text-zinc-400 group-hover:border-zinc-500 group-hover:text-white"
+                      : "border border-zinc-300 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 group-hover:border-zinc-400 dark:group-hover:border-zinc-500 group-hover:text-zinc-900 dark:group-hover:text-white"
                   }`}
                 >
                   Upgrade to {p.name}

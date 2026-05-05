@@ -36,7 +36,7 @@ function InputGroup({ label, placeholder, value, onChange }: { label: string; pl
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full bg-[#1c1c26] border border-[#2d2d3d] rounded-xl text-white p-4 outline-none focus:border-amber-500/60 transition-all placeholder:text-[#4A4A6A]"
+        className="w-full bg-zinc-100 dark:bg-[#1c1c26] border border-zinc-200 dark:border-[#2d2d3d] rounded-xl text-zinc-900 dark:text-white p-4 outline-none focus:border-amber-500/60 transition-all placeholder:text-zinc-400 dark:placeholder:text-[#4A4A6A]"
       />
     </div>
   );
@@ -50,7 +50,7 @@ function TextAreaGroup({ label, placeholder, value, onChange }: { label: string;
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full bg-[#1c1c26] border border-[#2d2d3d] rounded-xl text-white p-4 h-64 outline-none focus:border-amber-500/60 transition-all resize-none placeholder:text-[#4A4A6A]"
+        className="w-full bg-zinc-100 dark:bg-[#1c1c26] border border-zinc-200 dark:border-[#2d2d3d] rounded-xl text-zinc-900 dark:text-white p-4 h-64 outline-none focus:border-amber-500/60 transition-all resize-none placeholder:text-zinc-400 dark:placeholder:text-[#4A4A6A]"
       />
     </div>
   );
@@ -271,7 +271,7 @@ export default function AICVBuilder() {
   };
 
   return (
-    <div className="text-white max-w-5xl mx-auto space-y-10">
+    <div className="text-foreground max-w-5xl mx-auto space-y-10">
 
       {/* Header */}
       <div>
@@ -285,24 +285,24 @@ export default function AICVBuilder() {
       <div className="flex items-center gap-2">
         {STEPS.map((s, i) => (
           <div key={i} className="flex items-center gap-2 flex-1">
-            <div className={`flex items-center gap-2 text-xs font-semibold transition-colors ${isStepDone(i) ? "text-amber-500" : step === i + 1 ? "text-white" : "text-zinc-600"}`}>
-              <div className={`w-7 h-7 rounded-full flex items-center justify-center border transition-all ${isStepDone(i) ? "bg-amber-500 border-amber-500 text-black" : step === i + 1 ? "border-amber-500 text-amber-500" : "border-zinc-700 text-zinc-600"}`}>
+            <div className={`flex items-center gap-2 text-xs font-semibold transition-colors ${isStepDone(i) ? "text-amber-500" : step === i + 1 ? "text-zinc-900 dark:text-white" : "text-zinc-500 dark:text-zinc-600"}`}>
+              <div className={`w-7 h-7 rounded-full flex items-center justify-center border transition-all ${isStepDone(i) ? "bg-amber-500 border-amber-500 text-black" : step === i + 1 ? "border-amber-500 text-amber-500" : "border-zinc-300 dark:border-zinc-700 text-zinc-500 dark:text-zinc-600"}`}>
                 {isStepDone(i) ? <CheckCircle2 size={14} /> : i + 1}
               </div>
               <span className="hidden sm:block">{s.label}</span>
             </div>
-            {i < STEPS.length - 1 && <ChevronRight size={14} className="text-zinc-700 ml-auto" />}
+            {i < STEPS.length - 1 && <ChevronRight size={14} className="text-zinc-400 dark:text-zinc-700 ml-auto" />}
           </div>
         ))}
       </div>
 
       {/* Form card */}
-      <div className="bg-[#12121a] border border-[#272731] rounded-3xl p-8 shadow-2xl">
+      <div className="bg-white dark:bg-[#12121a] border border-zinc-200 dark:border-[#272731] rounded-3xl p-8 shadow-2xl">
 
         {/* Progress bar */}
         <div className="flex gap-2 mb-8">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className={`h-1 flex-1 rounded-full transition-all duration-700 ${step >= i ? "bg-amber-500" : "bg-[#272731]"}`} />
+            <div key={i} className={`h-1 flex-1 rounded-full transition-all duration-700 ${step >= i ? "bg-amber-500" : "bg-zinc-200 dark:bg-[#272731]"}`} />
           ))}
         </div>
 
@@ -359,10 +359,10 @@ export default function AICVBuilder() {
         {error && <p className="text-red-400 text-sm mt-2">{error}</p>}
 
         {/* Navigation */}
-        <div className="flex justify-between mt-8 pt-6 border-t border-[#272731]">
+        <div className="flex justify-between mt-8 pt-6 border-t border-zinc-200 dark:border-[#272731]">
           <button
             onClick={() => setStep((s) => Math.max(1, s - 1))}
-            className={`px-6 py-2.5 rounded-xl border border-[#2d2d3d] text-[#7A7A9A] font-medium transition-all hover:text-white ${step === 1 ? "invisible" : ""}`}
+            className={`px-6 py-2.5 rounded-xl border border-zinc-200 dark:border-[#2d2d3d] text-[#7A7A9A] font-medium transition-all hover:text-zinc-900 dark:hover:text-white ${step === 1 ? "invisible" : ""}`}
           >
             Back
           </button>
@@ -370,7 +370,7 @@ export default function AICVBuilder() {
             <button
               onClick={() => setStep((s) => s + 1)}
               disabled={!canGoNext()}
-              className="px-7 py-2.5 rounded-xl bg-[#1c1c26] border border-[#2d2d3d] text-white font-semibold flex items-center gap-2 hover:bg-[#252533] disabled:opacity-40 transition-all"
+              className="px-7 py-2.5 rounded-xl bg-zinc-100 dark:bg-[#1c1c26] border border-zinc-200 dark:border-[#2d2d3d] text-zinc-900 dark:text-white font-semibold flex items-center gap-2 hover:bg-zinc-200 dark:hover:bg-[#252533] disabled:opacity-40 transition-all"
             >
               Next Step <ArrowRight size={16} />
             </button>
@@ -407,7 +407,7 @@ export default function AICVBuilder() {
                 </button>
                 <button
                   onClick={() => setShowPreview(false)}
-                  className="p-2 rounded-xl border border-zinc-700 text-zinc-400 hover:text-white transition-colors"
+                  className="p-2 rounded-xl border border-zinc-600 text-zinc-300 hover:text-white transition-colors"
                 >
                   <X size={18} />
                 </button>
@@ -417,7 +417,7 @@ export default function AICVBuilder() {
             <div className="flex gap-3 mt-6 justify-center">
               <button
                 onClick={() => { setShowPreview(false); setStep(1); setAiResult(null); setFormData({ name: "", email: "", bio: "", target_role: "", experience: "", projects: "", skills: "" }); }}
-                className="px-6 py-2.5 rounded-xl border border-zinc-700 text-zinc-400 hover:text-white text-sm transition-all"
+                className="px-6 py-2.5 rounded-xl border border-zinc-600 text-zinc-300 hover:text-white text-sm transition-all"
               >
                 Generate Another
               </button>
@@ -428,7 +428,7 @@ export default function AICVBuilder() {
 
       {/* Past CV History */}
       <div>
-        <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+        <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
           <Clock size={16} className="text-amber-500" /> Past Generations
         </h2>
 
@@ -442,14 +442,14 @@ export default function AICVBuilder() {
               <div
                 key={cv.id}
                 onClick={() => { setAiResult(cv.cv_data); setShowPreview(true); }}
-                className="bg-[#12121a] border border-[#272731] rounded-2xl px-5 py-4 flex items-center justify-between cursor-pointer hover:border-amber-500/30 transition-all group"
+                className="bg-white dark:bg-[#12121a] border border-zinc-200 dark:border-[#272731] rounded-2xl px-5 py-4 flex items-center justify-between cursor-pointer hover:border-amber-500/30 transition-all group"
               >
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
                     <Target size={16} className="text-amber-500" />
                   </div>
                   <div>
-                    <p className="text-white font-medium text-sm">{cv.target_role || "General CV"}</p>
+                    <p className="text-zinc-900 dark:text-white font-medium text-sm">{cv.target_role || "General CV"}</p>
                     <p className="text-[#7A7A9A] text-xs mt-0.5">
                       {new Date(cv.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
                     </p>

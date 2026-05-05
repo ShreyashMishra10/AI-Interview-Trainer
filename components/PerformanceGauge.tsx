@@ -32,11 +32,12 @@ export const PerformanceGauge = ({ percentage = 85 }: { percentage?: number }) =
           cy={center}
           r={radius}
           fill="none"
-          stroke="#18181b"
+          stroke="currentColor"
           strokeWidth={strokeWidth}
           strokeDasharray={`${halfCircumference} ${circumference}`}
           strokeLinecap="round"
           transform={`rotate(180 ${center} ${center})`}
+          className="text-zinc-200 dark:text-[#18181b]"
         />
 
         <circle
@@ -55,7 +56,7 @@ export const PerformanceGauge = ({ percentage = 85 }: { percentage?: number }) =
       </svg>
 
       <div className="absolute inset-0 flex flex-col items-center justify-end pb-2">
-        <span className="text-7xl font-serif text-white">{percentage}%</span>
+        <span className="text-7xl font-serif text-zinc-900 dark:text-white">{percentage}%</span>
       </div>
     </div>
   );

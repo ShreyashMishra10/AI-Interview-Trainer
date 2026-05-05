@@ -73,7 +73,7 @@ function PasswordSection() {
                 value={value}
                 onChange={(e) => set(e.target.value)}
                 placeholder="••••••••"
-                className="w-full bg-[#0d0d16] border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-zinc-200 outline-none focus:border-amber-400/40 transition-colors pr-11 placeholder:text-zinc-700"
+                className="w-full bg-zinc-100 dark:bg-[#0d0d16] border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-zinc-800 dark:text-zinc-200 outline-none focus:border-amber-400/40 transition-colors pr-11 placeholder:text-zinc-400 dark:placeholder:text-zinc-700"
               />
               <button
                 onClick={() => setShow(!show)}
@@ -152,7 +152,7 @@ function ConnectedAccountsSection() {
             description={connected ? "Connected" : acc.soon ? "Coming soon" : "Not connected"}
           >
             {acc.soon ? (
-              <span className="text-[8px] bg-zinc-800 text-zinc-500 px-1.5 py-0.5 rounded font-bold tracking-wide">SOON</span>
+              <span className="text-[8px] bg-zinc-200 dark:bg-zinc-800 text-zinc-500 px-1.5 py-0.5 rounded font-bold tracking-wide">SOON</span>
             ) : (
               <button
                 disabled={!!loading || !user}
@@ -241,7 +241,7 @@ function SessionsSection() {
             <div className="flex items-center gap-3">
               <Smartphone size={16} className="text-zinc-600 shrink-0" />
               <div>
-                <p className="text-sm text-zinc-300 font-medium flex items-center gap-2">
+                <p className="text-sm text-zinc-700 dark:text-zinc-300 font-medium flex items-center gap-2">
                   {deviceLabel(s)}
                   {s.isCurrent && (
                     <span className="text-[9px] bg-emerald-500/15 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
@@ -337,7 +337,7 @@ function DangerZoneSection() {
                 value={deleteInput}
                 onChange={(e) => setDeleteInput(e.target.value)}
                 placeholder="Type DELETE"
-                className="w-full bg-[#0d0d16] border border-red-500/20 rounded-xl px-4 py-2.5 text-sm text-zinc-200 outline-none font-mono"
+                className="w-full bg-zinc-100 dark:bg-[#0d0d16] border border-red-500/20 rounded-xl px-4 py-2.5 text-sm text-zinc-800 dark:text-zinc-200 outline-none font-mono"
               />
               <div className="flex gap-2">
                 <button
@@ -350,7 +350,7 @@ function DangerZoneSection() {
                 </button>
                 <button
                   onClick={() => { setShowDelete(false); setDeleteInput(""); }}
-                  className="px-4 py-2 rounded-lg border border-zinc-800 text-zinc-500 text-xs hover:text-zinc-300 transition-colors cursor-pointer"
+                  className="px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-800 text-zinc-500 text-xs hover:text-zinc-900 dark:hover:text-zinc-300 transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -362,7 +362,7 @@ function DangerZoneSection() {
         <button
           onClick={handleSignOutAll}
           disabled={signingOutAll}
-          className="flex items-center gap-2 text-sm text-zinc-500 hover:text-zinc-300 transition-colors mt-2 disabled:opacity-40 cursor-pointer"
+          className="flex items-center gap-2 text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300 transition-colors mt-2 disabled:opacity-40 cursor-pointer"
         >
           {signingOutAll ? <Loader2 size={15} className="animate-spin" /> : <LogOut size={15} />}
           Sign out of all devices

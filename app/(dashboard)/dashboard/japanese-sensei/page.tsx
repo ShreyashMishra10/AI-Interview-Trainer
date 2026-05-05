@@ -153,7 +153,7 @@ function PhaseCard({ phase, completed: completedIds, onToggle }: {
   const toggleTopic = (id: string) => onToggle(id);
 
   return (
-    <div className={`bg-[#08080e] border border-zinc-800/60 rounded-2xl overflow-hidden transition-all duration-300 hover:border-zinc-700/60 ${open ? phase.glow : ""}`}>
+    <div className={`bg-white dark:bg-[#08080e] border border-zinc-200 dark:border-zinc-800/60 rounded-2xl overflow-hidden transition-all duration-300 hover:border-zinc-300 dark:hover:border-zinc-700/60 ${open ? phase.glow : ""}`}>
       {/* Header */}
       <button
         onClick={() => setOpen((v) => !v)}
@@ -167,21 +167,21 @@ function PhaseCard({ phase, completed: completedIds, onToggle }: {
         {/* Info */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-3 mb-1">
-            <span className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest">{phase.phase}</span>
-            <span className="text-[10px] text-zinc-700">·</span>
-            <span className="text-[10px] text-zinc-600 flex items-center gap-1">
+            <span className="text-[10px] text-zinc-500 dark:text-zinc-600 font-bold uppercase tracking-widest">{phase.phase}</span>
+            <span className="text-[10px] text-zinc-400 dark:text-zinc-700">·</span>
+            <span className="text-[10px] text-zinc-500 dark:text-zinc-600 flex items-center gap-1">
               <Clock size={10} /> {phase.duration}
             </span>
           </div>
-          <h3 className="text-white font-semibold text-base leading-none">{phase.title}</h3>
-          <p className="text-zinc-600 text-xs mt-1">{phase.subtitle}</p>
+          <h3 className="text-zinc-900 dark:text-white font-semibold text-base leading-none">{phase.title}</h3>
+          <p className="text-zinc-500 dark:text-zinc-600 text-xs mt-1">{phase.subtitle}</p>
         </div>
 
         {/* Progress */}
         <div className="shrink-0 text-right mr-3">
           <div className={`text-lg font-bold ${phase.color}`}>{pct}%</div>
-          <div className="text-[10px] text-zinc-700">{completed}/{total} done</div>
-          <div className="w-20 h-1 bg-zinc-800 rounded-full mt-1.5 overflow-hidden">
+          <div className="text-[10px] text-zinc-500 dark:text-zinc-700">{completed}/{total} done</div>
+          <div className="w-20 h-1 bg-zinc-200 dark:bg-zinc-800 rounded-full mt-1.5 overflow-hidden">
             <div
               className={`h-full rounded-full transition-all duration-700 ${
                 phase.color.replace("text-", "bg-")
@@ -192,44 +192,44 @@ function PhaseCard({ phase, completed: completedIds, onToggle }: {
         </div>
 
         {/* Chevron */}
-        <div className="text-zinc-600 group-hover:text-zinc-400 transition-colors shrink-0">
+        <div className="text-zinc-400 dark:text-zinc-600 group-hover:text-zinc-600 dark:group-hover:text-zinc-400 transition-colors shrink-0">
           {open ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
         </div>
       </button>
 
       {/* Topics */}
       {open && (
-        <div className="border-t border-zinc-800/60 divide-y divide-zinc-800/40">
+        <div className="border-t border-zinc-200 dark:border-zinc-800/60 divide-y divide-zinc-100 dark:divide-zinc-800/40">
           {phase.topics.map((topic) => {
             const done = completedIds.has(topic.id);
             return (
             <div
               key={topic.id}
               className={`px-6 py-4 flex items-start gap-4 transition-all duration-200 ${
-                done ? "opacity-50" : "hover:bg-zinc-900/30"
+                done ? "opacity-50" : "hover:bg-zinc-50 dark:hover:bg-zinc-900/30"
               }`}
             >
               <button onClick={() => toggleTopic(topic.id)} className="mt-0.5 shrink-0">
                 {done
                   ? <CheckCircle2 size={16} className={phase.color} />
-                  : <Circle size={16} className="text-zinc-700 hover:text-zinc-500 transition-colors" />
+                  : <Circle size={16} className="text-zinc-300 dark:text-zinc-700 hover:text-zinc-500 transition-colors" />
                 }
               </button>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap mb-1">
-                  <span className={`text-sm font-medium ${done ? "line-through text-zinc-600" : "text-zinc-200"}`}>
+                  <span className={`text-sm font-medium ${done ? "line-through text-zinc-400 dark:text-zinc-600" : "text-zinc-700 dark:text-zinc-200"}`}>
                     {topic.title}
                   </span>
                   {topic.japanese && (
-                    <span className="text-[11px] text-zinc-600">{topic.japanese}</span>
+                    <span className="text-[11px] text-zinc-400 dark:text-zinc-600">{topic.japanese}</span>
                   )}
                   <PriorityBadge priority={topic.priority} />
-                  <span className="text-[10px] text-zinc-700 flex items-center gap-1 ml-auto">
+                  <span className="text-[10px] text-zinc-400 dark:text-zinc-700 flex items-center gap-1 ml-auto">
                     <Clock size={9} /> {topic.timeEstimate}
                   </span>
                 </div>
                 {topic.tip && (
-                  <p className="text-[11px] text-zinc-600 leading-relaxed mt-1">
+                  <p className="text-[11px] text-zinc-500 dark:text-zinc-600 leading-relaxed mt-1">
                     💡 {topic.tip}
                   </p>
                 )}
@@ -277,19 +277,19 @@ export default function JapaneseSenseiPage() {
         <div>
           <div className="flex items-center gap-3 mb-2">
             <span className="text-3xl">🇯🇵</span>
-            <span className="text-[11px] text-zinc-600 font-bold uppercase tracking-[0.3em]">JP-Sensei</span>
+            <span className="text-[11px] text-zinc-500 dark:text-zinc-600 font-bold uppercase tracking-[0.3em]">JP-Sensei</span>
           </div>
-          <h1 className="text-4xl font-serif text-white tracking-tight">
+          <h1 className="text-4xl font-serif text-foreground tracking-tight">
             Japanese <span className="text-amber-400/90">Mastery</span> Roadmap
           </h1>
-          <p className="text-zinc-600 mt-2 text-sm">
+          <p className="text-zinc-500 dark:text-zinc-600 mt-2 text-sm">
             Everything you need to go from zero to fluent — structured, prioritized, and efficient.
           </p>
         </div>
         <div className="text-right hidden sm:block">
           <div className="text-3xl font-bold text-amber-400">{Math.round((completedTopics / totalTopics) * 100)}%</div>
-          <div className="text-xs text-zinc-600 mt-1">Overall progress</div>
-          <div className="text-[10px] text-zinc-700">{completedTopics}/{totalTopics} topics</div>
+          <div className="text-xs text-zinc-500 dark:text-zinc-600 mt-1">Overall progress</div>
+          <div className="text-[10px] text-zinc-400 dark:text-zinc-700">{completedTopics}/{totalTopics} topics</div>
         </div>
       </section>
 
@@ -301,16 +301,16 @@ export default function JapaneseSenseiPage() {
           { label: "Daily Time", value: "2 hrs", icon: <Clock size={14} />, color: "text-blue-400" },
           { label: "To Fluency", value: "12–18 mo", icon: <Zap size={14} />, color: "text-violet-400" },
         ].map((s) => (
-          <div key={s.label} className="bg-[#08080e] border border-zinc-800/60 rounded-xl p-4">
+          <div key={s.label} className="bg-white dark:bg-[#08080e] border border-zinc-200 dark:border-zinc-800/60 rounded-xl p-4">
             <div className={`${s.color} mb-2`}>{s.icon}</div>
             <div className={`text-lg font-bold ${s.color}`}>{s.value}</div>
-            <div className="text-[10px] text-zinc-600 font-medium uppercase tracking-wider mt-0.5">{s.label}</div>
+            <div className="text-[10px] text-zinc-500 dark:text-zinc-600 font-medium uppercase tracking-wider mt-0.5">{s.label}</div>
           </div>
         ))}
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-[#08080e] border border-zinc-800/60 rounded-xl p-1 w-fit">
+      <div className="flex gap-1 bg-white dark:bg-[#08080e] border border-zinc-200 dark:border-zinc-800/60 rounded-xl p-1 w-fit">
         {(["roadmap", "routine", "resources"] as const).map((tab) => (
           <button
             key={tab}
@@ -318,7 +318,7 @@ export default function JapaneseSenseiPage() {
             className={`px-5 py-2 rounded-lg text-xs font-semibold uppercase tracking-wider transition-all ${
               activeTab === tab
                 ? "bg-amber-400/15 text-amber-400 border border-amber-400/20"
-                : "text-zinc-600 hover:text-zinc-400"
+                : "text-zinc-500 dark:text-zinc-600 hover:text-zinc-700 dark:hover:text-zinc-400"
             }`}
           >
             {tab}
@@ -329,7 +329,7 @@ export default function JapaneseSenseiPage() {
       {/* ── Roadmap Tab ── */}
       {activeTab === "roadmap" && (
         <div className="space-y-4">
-          <p className="text-xs text-zinc-600 mb-2">
+          <p className="text-xs text-zinc-500 dark:text-zinc-600 mb-2">
             Click each phase to expand. Check off topics as you complete them.
           </p>
           {ROADMAP.map((phase) => (
@@ -341,25 +341,25 @@ export default function JapaneseSenseiPage() {
       {/* ── Daily Routine Tab ── */}
       {activeTab === "routine" && (
         <div className="space-y-4">
-          <div className="bg-[#08080e] border border-amber-400/15 rounded-2xl p-6 mb-6">
+          <div className="bg-white dark:bg-[#08080e] border border-amber-400/15 rounded-2xl p-6 mb-6">
             <h3 className="text-amber-400 text-xs font-bold uppercase tracking-widest mb-2">The Golden Rule</h3>
-            <p className="text-zinc-300 text-sm leading-relaxed">
-              <strong className="text-white">2 hours every day beats 14 hours on Sunday.</strong> Consistency is the only variable that matters in language learning. Miss a day and you lose more than one day's progress.
+            <p className="text-zinc-600 dark:text-zinc-300 text-sm leading-relaxed">
+              <strong className="text-zinc-900 dark:text-white">2 hours every day beats 14 hours on Sunday.</strong> Consistency is the only variable that matters in language learning. Miss a day and you lose more than one day&apos;s progress.
             </p>
           </div>
 
           <div className="grid gap-3">
             {DAILY_ROUTINE.map((item, i) => (
-              <div key={i} className="bg-[#08080e] border border-zinc-800/60 rounded-xl p-5 flex items-center gap-5 hover:border-zinc-700/60 transition-all">
+              <div key={i} className="bg-white dark:bg-[#08080e] border border-zinc-200 dark:border-zinc-800/60 rounded-xl p-5 flex items-center gap-5 hover:border-zinc-300 dark:hover:border-zinc-700/60 transition-all">
                 <div className="text-2xl w-10 text-center shrink-0">{item.icon}</div>
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-1">
                     <span className={`text-sm font-semibold ${item.color}`}>{item.activity}</span>
-                    <span className="text-[10px] text-zinc-700 flex items-center gap-1">
+                    <span className="text-[10px] text-zinc-400 dark:text-zinc-700 flex items-center gap-1">
                       <Clock size={9} /> {item.time}
                     </span>
                   </div>
-                  <p className="text-xs text-zinc-600">{item.desc}</p>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-600">{item.desc}</p>
                 </div>
                 <div className={`text-lg font-bold ${item.color} opacity-40 shrink-0`}>
                   {String(i + 1).padStart(2, "0")}
@@ -368,10 +368,10 @@ export default function JapaneseSenseiPage() {
             ))}
           </div>
 
-          <div className="bg-[#08080e] border border-zinc-800/60 rounded-xl p-5 mt-4">
+          <div className="bg-white dark:bg-[#08080e] border border-zinc-200 dark:border-zinc-800/60 rounded-xl p-5 mt-4">
             <div className="flex items-center gap-2 mb-3">
               <Star size={14} className="text-amber-400" />
-              <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Pro Tips</span>
+              <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Pro Tips</span>
             </div>
             <div className="space-y-2">
               {[
@@ -395,11 +395,11 @@ export default function JapaneseSenseiPage() {
       {activeTab === "resources" && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {RESOURCES.map((r) => (
-            <div key={r.name} className="bg-[#08080e] border border-zinc-800/60 rounded-xl p-5 group hover:border-zinc-700/60 transition-all cursor-pointer">
+            <div key={r.name} className="bg-white dark:bg-[#08080e] border border-zinc-200 dark:border-zinc-800/60 rounded-xl p-5 group hover:border-zinc-300 dark:hover:border-zinc-700/60 transition-all cursor-pointer">
               <div className="flex items-start justify-between mb-3">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-sm font-bold text-zinc-200">{r.name}</span>
+                    <span className="text-sm font-bold text-zinc-700 dark:text-zinc-200">{r.name}</span>
                     <span className={`text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full border ${
                       r.tag === "Essential"
                         ? "bg-red-500/10 text-red-400 border-red-500/20"
@@ -410,9 +410,9 @@ export default function JapaneseSenseiPage() {
                       {r.tag}
                     </span>
                   </div>
-                  <span className="text-[10px] text-zinc-600 uppercase tracking-wider">{r.type}</span>
+                  <span className="text-[10px] text-zinc-400 dark:text-zinc-600 uppercase tracking-wider">{r.type}</span>
                 </div>
-                <ArrowUpRight size={14} className="text-zinc-700 group-hover:text-amber-400 transition-colors mt-0.5" />
+                <ArrowUpRight size={14} className="text-zinc-400 dark:text-zinc-700 group-hover:text-amber-400 transition-colors mt-0.5" />
               </div>
               <p className="text-xs text-zinc-500 leading-relaxed">{r.desc}</p>
             </div>

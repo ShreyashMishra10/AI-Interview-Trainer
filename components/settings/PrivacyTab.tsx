@@ -123,15 +123,15 @@ export function PrivacyTab() {
       <SettingSection title="Your Data">
         <div className="p-5 space-y-3">
           {/* Export */}
-          <div className="flex items-center justify-between p-4 bg-[#0d0d16] rounded-xl border border-zinc-800">
+          <div className="flex items-center justify-between p-4 bg-zinc-50 dark:bg-[#0d0d16] rounded-xl border border-zinc-200 dark:border-zinc-800">
             <div>
-              <p className="text-sm font-medium text-zinc-300">Export My Data</p>
+              <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Export My Data</p>
               <p className="text-xs text-zinc-600 mt-0.5">Download all your interviews, scores, and CVs as JSON</p>
             </div>
             <button
               onClick={handleExport}
               disabled={exporting}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg border border-zinc-700 text-zinc-400 text-xs font-semibold hover:border-amber-400/30 hover:text-amber-400 transition-all disabled:opacity-50"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 text-xs font-semibold hover:border-amber-400/30 hover:text-amber-400 transition-all disabled:opacity-50"
             >
               {exporting ? <Loader2 size={13} className="animate-spin" /> : <Download size={13} />}
               {exporting ? "Exporting…" : "Export"}
@@ -139,9 +139,9 @@ export function PrivacyTab() {
           </div>
 
           {/* Clear history */}
-          <div className="flex items-center justify-between p-4 bg-[#0d0d16] rounded-xl border border-zinc-800">
+          <div className="flex items-center justify-between p-4 bg-zinc-50 dark:bg-[#0d0d16] rounded-xl border border-zinc-200 dark:border-zinc-800">
             <div>
-              <p className="text-sm font-medium text-zinc-300">Clear Interview History</p>
+              <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Clear Interview History</p>
               <p className="text-xs text-zinc-600 mt-0.5">Permanently remove all past session records</p>
             </div>
             {confirmClear ? (
@@ -159,7 +159,7 @@ export function PrivacyTab() {
                 </button>
                 <button
                   onClick={() => setConfirmClear(false)}
-                  className="px-3 py-1.5 rounded-lg border border-zinc-700 text-zinc-400 text-xs font-semibold hover:text-white transition"
+                  className="px-3 py-1.5 rounded-lg border border-zinc-300 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 text-xs font-semibold hover:text-zinc-900 dark:hover:text-white transition"
                 >
                   Cancel
                 </button>
