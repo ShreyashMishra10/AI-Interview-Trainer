@@ -1,13 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { Check, X, Zap, Star, Crown, ShieldCheck, BadgeCheck, Headphones } from "lucide-react";
+import { Check, X, Zap, Star, Crown, ShieldCheck, BadgeCheck, Headphones, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { useAuth } from "@clerk/nextjs";
 import { Footer } from "@/components/Footer";
+import { openCheckout } from "@/lib/checkout";
 
 const PLANS = [
   {
     name: "Free",
+    planKey: null as null | "pro" | "enterprise",
     monthlyPrice: "₹0",
     annualPrice: "₹0",
     period: "forever",
@@ -28,6 +31,7 @@ const PLANS = [
   },
   {
     name: "Pro",
+    planKey: "pro" as "pro",
     monthlyPrice: "₹499",
     annualPrice: "₹399",
     period: "/month",
@@ -51,6 +55,7 @@ const PLANS = [
   },
   {
     name: "Enterprise",
+    planKey: "enterprise" as "enterprise",
     monthlyPrice: "₹1,999",
     annualPrice: "₹1,599",
     period: "/month",
@@ -129,6 +134,25 @@ function FeatureCell({ value }: { value: string | boolean }) {
 
 export default function PricingPage() {
   const [annual, setAnnual] = useState(false);
+  const [paying, setPaying] = useState<string | null>(null);
+  const { isSignedIn } = useAuth();
+
+  async function handleUpgrade(planKey: "pro" | "enterprise") {
+    if (!isSignedIn) {
+      window.location.href = "/sign-up";
+      return;
+    }
+    setPaying(planKey);
+    await openCheckout({
+      plan:      planKey,
+      cycle:     annual ? "annual" : "monthly",
+      onSuccess: () => {
+        setPaying(null);
+        window.location.href = "/dashboard/settings?tab=subscription";
+      },
+      onError: () => setPaying(null),
+    });
+  }
 
   return (
     <div className="min-h-screen bg-background transition-colors duration-300">
@@ -223,16 +247,27 @@ export default function PricingPage() {
                     ))}
                   </ul>
 
-                  <Link
-                    href={plan.href}
-                    className={`w-full py-3 rounded-xl text-xs font-bold text-center transition-all block ${
-                      plan.highlight
-                        ? "bg-amber-500 text-black hover:bg-amber-400"
-                        : "bg-zinc-50 dark:bg-zinc-900 border border-border text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    {plan.cta}
-                  </Link>
+                  {plan.planKey ? (
+                    <button
+                      onClick={() => handleUpgrade(plan.planKey!)}
+                      disabled={paying === plan.planKey}
+                      className={`w-full py-3 rounded-xl text-xs font-bold text-center transition-all flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed ${
+                        plan.highlight
+                          ? "bg-amber-500 text-black hover:bg-amber-400"
+                          : "bg-zinc-50 dark:bg-zinc-900 border border-border text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      {paying === plan.planKey && <Loader2 size={12} className="animate-spin" />}
+                      {plan.cta}
+                    </button>
+                  ) : (
+                    <Link
+                      href={plan.href}
+                      className="w-full py-3 rounded-xl text-xs font-bold text-center transition-all block bg-zinc-50 dark:bg-zinc-900 border border-border text-muted-foreground hover:text-foreground"
+                    >
+                      {plan.cta}
+                    </Link>
+                  )}
                 </div>
               );
             })}
@@ -332,12 +367,14 @@ export default function PricingPage() {
               The free plan gets you started, but <strong className="text-foreground">Pro</strong> removes every limit — unlimited interviews, CVs, voice mode, and AI reports.
             </p>
             <div className="flex items-center justify-center gap-4 flex-wrap">
-              <Link
-                href="/sign-up"
-                className="px-6 py-3 rounded-xl bg-amber-500 text-black text-sm font-bold hover:bg-amber-400 transition-all"
+              <button
+                onClick={() => handleUpgrade("pro")}
+                disabled={paying === "pro"}
+                className="px-6 py-3 rounded-xl bg-amber-500 text-black text-sm font-bold hover:bg-amber-400 transition-all flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
               >
+                {paying === "pro" && <Loader2 size={14} className="animate-spin" />}
                 Upgrade to Pro — ₹499/mo
-              </Link>
+              </button>
               <Link
                 href="/sign-up"
                 className="px-6 py-3 rounded-xl border border-border text-muted-foreground text-sm font-medium hover:border-foreground transition-all"

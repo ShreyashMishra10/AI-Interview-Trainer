@@ -11,6 +11,7 @@ const isPublicRoute = createRouteMatcher([
   "/sign-in(.*)",
   "/sign-up(.*)",
   "/api/demo-chat",
+  "/api/payments/webhook", // Razorpay server-to-server, cannot use Clerk auth
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
