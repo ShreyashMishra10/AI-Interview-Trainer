@@ -122,7 +122,7 @@ const FAQS: Record<string, { q: string; a: string }[]> = {
     },
     {
       q: "Do you offer a refund?",
-      a: "We don't offer pro-rated refunds for mid-cycle cancellations. Annual plan refunds may be considered within 7 days of purchase — contact support@ai-trainer.com.",
+      a: "We don't offer pro-rated refunds for mid-cycle cancellations. Annual plan refunds may be considered within 7 days of purchase — contact aitrainer.support@gmail.com.",
     },
     {
       q: "What payment methods are accepted?",
@@ -245,7 +245,7 @@ export default function FaqPage() {
           <h1 className="text-4xl font-serif tracking-tight mb-3">Frequently Asked Questions</h1>
           <p className="text-muted-foreground text-sm max-w-lg">
             Everything you need to know about AI-Trainer. Can&apos;t find your answer?{" "}
-            <a href="mailto:support@ai-trainer.com" className="text-amber-500 hover:underline font-medium">
+            <a href="mailto:aitrainer.support@gmail.com" className="text-amber-500 hover:underline font-medium">
               Email us
             </a>.
           </p>

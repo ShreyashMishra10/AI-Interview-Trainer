@@ -4,7 +4,7 @@ import Link from "next/link";
 export function Footer() {
   return (
     <>
-      <section className="px-10 lg:px-40 relative z-10 -mb-10 mt-10">
+      <section className="max-w-[1250px] mx-auto px-6 relative z-10 -mb-10 mt-10">
         <div className="bg-zinc-950 rounded-[2.5rem] p-12 lg:p-20 flex flex-col md:flex-row items-center justify-between border border-zinc-800 shadow-2xl overflow-hidden relative">
           <div className="max-w-xl z-10">
             <h2 className="text-4xl lg:text-5xl font-bold tracking-tighter text-white mb-4">
@@ -30,8 +30,8 @@ export function Footer() {
           <div className="absolute right-0 top-0 h-full w-1/2 bg-gradient-to-l from-indigo-500/10 to-transparent pointer-events-none opacity-50" />
         </div>
       </section>
-      <footer className="bg-black pt-18 pb-10 px-10 lg:px-40">
-        <div className="max-w-[1400px] mx-auto">
+      <footer className="bg-black pt-18 pb-10 px-6">
+        <div className="max-w-[1100px] mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-6 gap-10 lg:gap-16 border-b border-white/5 pb-20">
             <div className="md:col-span-3 flex flex-col items-start">
               <Link
@@ -48,19 +48,11 @@ export function Footer() {
               <div className="flex gap-16 mt-auto">
                 <div>
                   <h5 className="text-[10px] uppercase tracking-[0.2em] text-zinc-600 mb-3 font-bold">
-                    Phone
-                  </h5>
-                  <p className="text-zinc-300 text-sm hover:text-white cursor-pointer transition-colors">
-                    1-800-AI-READY
-                  </p>
-                </div>
-                <div>
-                  <h5 className="text-[10px] uppercase tracking-[0.2em] text-zinc-600 mb-3 font-bold">
                     Email
                   </h5>
-                  <p className="text-zinc-300 text-sm hover:text-white cursor-pointer transition-colors">
-                    support@ai-trainer.com
-                  </p>
+                  <a href="mailto:aitrainer.support@gmail.com" className="text-zinc-300 text-sm hover:text-white transition-colors">
+                    aitrainer.support@gmail.com
+                  </a>
                 </div>
               </div>
             </div>

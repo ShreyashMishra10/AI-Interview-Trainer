@@ -102,6 +102,7 @@ export const SERVICES = [
 export const PLANS = [
   {
     name: "Free",
+    planKey: null as null | "pro" | "enterprise",
     price: "₹0",
     period: "forever",
     description: "Get started with the essentials",
@@ -114,11 +115,13 @@ export const PLANS = [
       "Chat mode interviews",
     ],
     cta: "Get Started Free",
+    href: "/sign-up",
     highlight: false,
     icon: <Zap size={16} />,
   },
   {
     name: "Pro",
+    planKey: "pro" as "pro",
     price: "₹499",
     period: "/month",
     description: "Unlock your full interview potential",
@@ -133,11 +136,13 @@ export const PLANS = [
       "Priority support",
     ],
     cta: "Upgrade to Pro",
+    href: "/sign-up",
     highlight: true,
     icon: <Star size={16} />,
   },
   {
     name: "Enterprise",
+    planKey: "enterprise" as "enterprise",
     price: "₹1,999",
     period: "/month",
     description: "For teams and institutions",
@@ -152,6 +157,7 @@ export const PLANS = [
       "SLA & compliance support",
     ],
     cta: "Contact Us",
+    href: "mailto:shreyashmishra9044@gmail.com?subject=Enterprise%20Plan%20Enquiry",
     highlight: false,
     icon: <Crown size={16} />,
   },

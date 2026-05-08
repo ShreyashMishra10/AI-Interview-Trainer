@@ -232,7 +232,7 @@ export default function PrivacyPolicyPage() {
               ]} />
               <div className="mt-4">
                 <Highlight>
-                  Exercise these rights in <strong>Settings → Privacy</strong> or email <strong>privacy@ai-interview-trainer.com</strong>.
+                  Exercise these rights in <strong>Settings → Privacy</strong> or email <strong>aitrainer.support@gmail.com</strong>.
                 </Highlight>
               </div>
             </Section>
@@ -262,7 +262,7 @@ export default function PrivacyPolicyPage() {
               <div className="bg-card border border-border rounded-xl p-5 space-y-3">
                 <div className="flex gap-4">
                   <span className="text-[11px] text-muted-foreground font-bold uppercase tracking-widest w-28 shrink-0">Email</span>
-                  <span className="text-foreground text-sm font-medium">privacy@ai-interview-trainer.com</span>
+                  <span className="text-foreground text-sm font-medium">aitrainer.support@gmail.com</span>
                 </div>
                 <div className="flex gap-4">
                   <span className="text-[11px] text-muted-foreground font-bold uppercase tracking-widest w-28 shrink-0">Location</span>

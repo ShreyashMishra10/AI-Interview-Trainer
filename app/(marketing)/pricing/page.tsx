@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Check, X, Zap, Star, Crown, ShieldCheck, BadgeCheck, Headphones, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@clerk/nextjs";
@@ -135,7 +135,19 @@ function FeatureCell({ value }: { value: string | boolean }) {
 export default function PricingPage() {
   const [annual, setAnnual] = useState(false);
   const [paying, setPaying] = useState<string | null>(null);
+  const [currentPlan, setCurrentPlan] = useState<string | null | undefined>(undefined);
   const { isSignedIn } = useAuth();
+
+  useEffect(() => {
+    if (isSignedIn) {
+      fetch("/api/profile")
+        .then((r) => r.json())
+        .then((p) => setCurrentPlan(p.plan ?? "free"))
+        .catch(() => setCurrentPlan(null));
+    } else if (isSignedIn === false) {
+      setCurrentPlan(null);
+    }
+  }, [isSignedIn]);
 
   async function handleUpgrade(planKey: "pro" | "enterprise") {
     if (!isSignedIn) {
@@ -212,7 +224,7 @@ export default function PricingPage() {
                   key={plan.name}
                   className={`relative flex flex-col rounded-2xl border p-6 transition-all duration-300 bg-white shadow-md border-zinc-200 dark:bg-card dark:border-border dark:shadow-none hover:-translate-y-2 hover:shadow-xl ${
                     plan.highlight ? "ring-1 ring-amber-500/30 border-amber-500/30 dark:bg-amber-500/[0.03]" : ""
-                  }`}
+                  } ${currentPlan === plan.planKey && plan.planKey ? "-translate-y-2 shadow-xl ring-2 ring-amber-500/50" : ""}`}
                 >
                   {plan.highlight && (
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-500 text-black text-[10px] font-bold uppercase tracking-widest px-4 py-1 rounded-full shadow-lg">
@@ -249,16 +261,20 @@ export default function PricingPage() {
 
                   {plan.planKey ? (
                     <button
-                      onClick={() => handleUpgrade(plan.planKey!)}
-                      disabled={paying === plan.planKey}
-                      className={`w-full py-3 rounded-xl text-xs font-bold text-center transition-all flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed ${
-                        plan.highlight
-                          ? "bg-amber-500 text-black hover:bg-amber-400"
-                          : "bg-zinc-50 dark:bg-zinc-900 border border-border text-muted-foreground hover:text-foreground"
+                      onClick={() => currentPlan !== plan.planKey && currentPlan !== undefined && handleUpgrade(plan.planKey!)}
+                      disabled={paying === plan.planKey || currentPlan === plan.planKey || currentPlan === undefined}
+                      className={`w-full py-3 rounded-xl text-xs font-bold text-center transition-all flex items-center justify-center gap-2 disabled:cursor-not-allowed ${
+                        currentPlan === plan.planKey
+                          ? "bg-zinc-200 dark:bg-zinc-800 text-zinc-500"
+                          : currentPlan === undefined
+                            ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-400 animate-pulse"
+                            : plan.highlight
+                              ? "bg-amber-500 text-black hover:bg-amber-400"
+                              : "bg-zinc-50 dark:bg-zinc-900 border border-border text-muted-foreground hover:text-foreground"
                       }`}
                     >
                       {paying === plan.planKey && <Loader2 size={12} className="animate-spin" />}
-                      {plan.cta}
+                      {currentPlan === plan.planKey ? "Current Plan" : currentPlan === undefined ? "Loading..." : plan.cta}
                     </button>
                   ) : (
                     <Link
@@ -356,34 +372,48 @@ export default function PricingPage() {
         </section>
 
         {/* ── CTA ── */}
-        <section className="bg-white dark:bg-card border border-amber-500/20 rounded-3xl p-8 sm:p-12 text-center relative overflow-hidden shadow-sm dark:shadow-none">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(251,191,36,0.04),transparent_70%)]" />
-          <div className="relative z-10">
-            <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mx-auto mb-5">
-              <Star size={24} className="text-amber-500" />
-            </div>
-            <h2 className="text-3xl font-serif text-foreground mb-3">Ready to ace your next interview?</h2>
-            <p className="text-muted-foreground text-sm max-w-lg mx-auto mb-8 leading-relaxed font-medium">
-              The free plan gets you started, but <strong className="text-foreground">Pro</strong> removes every limit — unlimited interviews, CVs, voice mode, and AI reports.
-            </p>
-            <div className="flex items-center justify-center gap-4 flex-wrap">
-              <button
-                onClick={() => handleUpgrade("pro")}
-                disabled={paying === "pro"}
-                className="px-6 py-3 rounded-xl bg-amber-500 text-black text-sm font-bold hover:bg-amber-400 transition-all flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                {paying === "pro" && <Loader2 size={14} className="animate-spin" />}
-                Upgrade to Pro — ₹499/mo
-              </button>
-              <Link
-                href="/sign-up"
-                className="px-6 py-3 rounded-xl border border-border text-muted-foreground text-sm font-medium hover:border-foreground transition-all"
-              >
-                Start for Free
-              </Link>
-            </div>
-          </div>
-        </section>
+        {(() => {
+          const isPro = currentPlan === "pro" || currentPlan === "enterprise";
+          return (
+            <section className="bg-white dark:bg-card border border-amber-500/20 rounded-3xl p-8 sm:p-12 text-center relative overflow-hidden shadow-sm dark:shadow-none">
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(251,191,36,0.04),transparent_70%)]" />
+              <div className="relative z-10">
+                <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mx-auto mb-5">
+                  <Star size={24} className="text-amber-500" />
+                </div>
+                <h2 className="text-3xl font-serif text-foreground mb-3">
+                  {isPro ? "You're on Pro — enjoy every limit removed." : "Ready to ace your next interview?"}
+                </h2>
+                <p className="text-muted-foreground text-sm max-w-lg mx-auto mb-8 leading-relaxed font-medium">
+                  {isPro
+                    ? "Unlimited interviews, CVs, voice mode, and AI reports are all yours. Head to your dashboard to keep practising."
+                    : <>The free plan gets you started, but <strong className="text-foreground">Pro</strong> removes every limit — unlimited interviews, CVs, voice mode, and AI reports.</>}
+                </p>
+                <div className="flex items-center justify-center gap-4 flex-wrap">
+                  {isPro ? (
+                    <Link href="/dashboard" className="px-6 py-3 rounded-xl bg-amber-500 text-black text-sm font-bold hover:bg-amber-400 transition-all">
+                      Go to Dashboard
+                    </Link>
+                  ) : (
+                    <button
+                      onClick={() => handleUpgrade("pro")}
+                      disabled={paying === "pro"}
+                      className="px-6 py-3 rounded-xl bg-amber-500 text-black text-sm font-bold hover:bg-amber-400 transition-all flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                      {paying === "pro" && <Loader2 size={14} className="animate-spin" />}
+                      Upgrade to Pro — ₹499/mo
+                    </button>
+                  )}
+                  {!isPro && (
+                    <Link href="/sign-up" className="px-6 py-3 rounded-xl border border-border text-muted-foreground text-sm font-medium hover:border-foreground transition-all">
+                      Start for Free
+                    </Link>
+                  )}
+                </div>
+              </div>
+            </section>
+          );
+        })()}
 
       </div>
       <Footer />
