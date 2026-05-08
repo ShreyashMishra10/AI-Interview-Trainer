@@ -18,18 +18,18 @@ const securityHeaders = [
     value: [
       "default-src 'self'",
       // Next.js + Clerk require unsafe-inline/eval for hydration and auth widgets
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.clerk.com https://*.clerk.accounts.dev https://challenges.cloudflare.com",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.clerk.com https://*.clerk.accounts.dev https://challenges.cloudflare.com https://checkout.razorpay.com",
       // Google Fonts + Clerk styles
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.clerk.com https://*.clerk.accounts.dev",
       "img-src 'self' data: https:",
       "font-src 'self' data: https://fonts.gstatic.com",
       // data: and blob: needed for speech synthesis audio; Google for Web Speech API
       "media-src 'self' data: blob:",
-      "connect-src 'self' https://*.clerk.com https://*.clerk.accounts.dev https://*.supabase.co wss://*.supabase.co https://*.sentry.io https://*.ingest.sentry.io https://www.google.com https://speech.googleapis.com https://challenges.cloudflare.com",
+      "connect-src 'self' https://*.clerk.com https://*.clerk.accounts.dev https://*.supabase.co wss://*.supabase.co https://*.sentry.io https://*.ingest.sentry.io https://www.google.com https://speech.googleapis.com https://challenges.cloudflare.com https://*.razorpay.com",
       "worker-src blob:",
       // Block all frames except Cloudflare Turnstile (Clerk CAPTCHA)
       "frame-ancestors 'none'",
-      "frame-src https://challenges.cloudflare.com",
+      "frame-src https://challenges.cloudflare.com https://*.razorpay.com",
       "object-src 'none'",
       "base-uri 'self'",
       "form-action 'self'",
