@@ -8,6 +8,8 @@ import {
   Mic2, FileText, Languages, BarChart3, Radio, Zap,
   ArrowRight, Star, BookOpen, Trophy,
 } from "lucide-react";
+import { TypewriterText } from "@/components/TypewriterText";
+import { CountUp } from "@/components/CountUp";
 import Link from "next/link";
 
 /* ── SEO Metadata ──────────────────────────────────────────── */
@@ -177,7 +179,7 @@ export default async function Home() {
         {/* Hero text — centered when logged in, left-aligned when not */}
         <div className={`space-y-6 relative z-10 self-center ${isLoggedIn ? "w-full text-center flex flex-col items-center" : "flex-1"}`}>
           <div
-            className="animate-reveal inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 rounded-full px-4 py-1.5"
+            className="animate-from-left inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 rounded-full px-4 py-1.5"
             style={{ animationDelay: "0ms" }}
           >
             <Zap size={12} className="text-amber-500" aria-hidden />
@@ -195,16 +197,15 @@ export default async function Home() {
           </h1>
 
           <p
-            className="animate-reveal text-lg text-muted-foreground max-w-xl"
-            style={{ animationDelay: "300ms" }}
+            className="animate-focus-in text-lg text-muted-foreground max-w-xl"
+            style={{ animationDelay: "320ms" }}
           >
-            Practice real-time coding and behavioral questions with an AI that
-            adapts to your skill level.
+            Practice <TypewriterText />
           </p>
 
           <div
-            className="animate-reveal flex flex-col sm:flex-row items-center gap-4"
-            style={{ animationDelay: "450ms" }}
+            className="animate-spring flex flex-col sm:flex-row items-center gap-4"
+            style={{ animationDelay: "500ms" }}
           >
             {isLoggedIn ? (
               <Link href="/dashboard">
@@ -248,10 +249,10 @@ export default async function Home() {
         <div className="max-w-[1100px] mx-auto px-6 lg:px-20">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {STATS.map((s, i) => (
-              <Reveal key={s.label} delay={i * 80}>
+              <Reveal key={s.label} delay={i * 90} variant="pop">
                 <div className="bg-white dark:bg-card border border-zinc-200 dark:border-border rounded-2xl p-6 shadow-sm dark:shadow-none flex flex-col items-center text-center gap-2 hover:border-amber-500/30 hover:shadow-[0_0_30px_rgba(251,191,36,0.07)] transition-all duration-300">
                   <div className="text-amber-500">{s.icon}</div>
-                  <div className="text-3xl font-bold tracking-tight text-foreground">{s.value}</div>
+                  <div className="text-3xl font-bold tracking-tight text-foreground"><CountUp value={s.value} /></div>
                   <div className="text-xs text-muted-foreground font-bold uppercase tracking-wider">{s.label}</div>
                 </div>
               </Reveal>
@@ -322,7 +323,7 @@ export default async function Home() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {FEATURES.map((f, i) => (
-              <Reveal key={f.title} delay={i * 70}>
+              <Reveal key={f.title} delay={i * 80} variant="pop">
                 <div className="bg-white dark:bg-card border border-zinc-200 dark:border-border rounded-2xl p-6 shadow-sm dark:shadow-none hover:border-amber-500/20 hover:shadow-[0_8px_30px_rgba(0,0,0,0.10)] hover:-translate-y-2 transition-all duration-300 h-full">
                   <div className={`w-10 h-10 rounded-xl border flex items-center justify-center mb-4 ${f.bg} ${f.color}`}>
                     {f.icon}
@@ -349,7 +350,7 @@ export default async function Home() {
             Practice across the full modern stack.
           </h2>
         </Reveal>
-        <div className="relative flex" aria-hidden>
+        <div className="relative flex marquee-track" aria-hidden>
           <div className="animate-marquee whitespace-nowrap flex items-center gap-12 lg:gap-24">
             {[...MARQUEE_ITEMS, ...MARQUEE_ITEMS].map((t, i) => (
               <span
@@ -365,7 +366,7 @@ export default async function Home() {
 
       {/* ── EARLY ACCESS CTA ──────────────────────────────────── */}
       <section aria-label="Early access" className="max-w-[1100px] mx-auto px-6 lg:px-20 py-24">
-        <Reveal>
+        <Reveal variant="pop">
           <div className="bg-white dark:bg-card border border-amber-500/20 rounded-3xl p-10 sm:p-14 text-center relative overflow-hidden shadow-sm dark:shadow-none">
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(251,191,36,0.05),transparent_70%)]" />
             <div className="relative z-10">
